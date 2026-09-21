@@ -3,28 +3,58 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="theme-color" content="#03070e" />
-    <title>The sleeping grove</title>
+    <meta name="theme-color" content="#08090e" />
+    <title>Unusual Interaction</title>
+    <link rel="icon" href="data:," />
+    <link rel="preload" href="assets/environment.png" as="image" />
+    <link rel="preload" href="assets/fairy.png" as="image" />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <main aria-label="The sleeping grove, an interactive fairy experience">
-      <canvas id="world" aria-hidden="true"></canvas
-      ><svg
-        id="paths"
-        viewBox="0 0 1440 900"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-      >
-        <defs>
-          <filter id="soft"><feGaussianBlur stdDeviation="3" /></filter>
-        </defs>
-        <g id="glyphs"></g>
-      </svg>
-      <div id="dots" aria-label="Explore the lights"></div>
-      <div id="fairies"></div>
-      <p id="speech" role="status"></p>
-      <p id="accessible" class="sr-only" aria-live="polite"></p>
+    <main
+      id="screen-one"
+      aria-label="An encounter with a fairy"
+      data-state="idle"
+    >
+      <img
+        class="environment"
+        src="assets/environment.png"
+        alt=""
+        draggable="false"
+      />
+      <div class="fairy-position" id="fairy-position">
+        <div class="fairy-float">
+          <div
+            class="fairy-turn"
+            id="fairy-turn"
+            role="button"
+            tabindex="0"
+            aria-label="Fairy. Double-tap to twirl"
+            aria-describedby="dialogue-text"
+          >
+            <div class="fairy-art" aria-hidden="true">
+              <img
+                class="fairy-layer fairy-body"
+                src="assets/fairy.png"
+                alt=""
+                draggable="false"
+              />
+              <img
+                class="fairy-layer fairy-wing"
+                src="assets/fairy.png"
+                alt=""
+                draggable="false"
+              />
+            </div>
+          </div>
+          <div class="dialogue">
+            <img src="assets/dialogue.svg" alt="" draggable="false" />
+            <p id="dialogue-text">
+              Tap me twice<br /><span>to move next.</span>
+            </p>
+          </div>
+        </div>
+      </div>
     </main>
     <script type="module" src="js/main.js"></script>
   </body>

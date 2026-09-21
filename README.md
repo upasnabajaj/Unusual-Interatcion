@@ -1,25 +1,18 @@
-# The sleeping grove
+# Unusual Interaction — Screen 1
 
-An original, desktop-first unusual-interaction experience. No dependencies or build step. Serve the repository over HTTP and open `index.html`.
+Screen 1 is implemented from [Figma node 269:2](https://www.figma.com/design/vfHLFM7rPdrIF8UjVrL1Yt/test?node-id=269-2). The original background and fairy are separate, unchanged PNG assets. The original dialogue outline is SVG; its Manrope text is live HTML.
 
-Double-click / double-tap the white fairy to begin. Drag her through lights or select lights directly. Strong drags out of the viewport carry her around the same grove and back in from the opposite edge without losing discoveries. Three rounds contain 12 lights each, with 3, 4, and 5 discoveries. Completed routes lead into flower glyphs; the same three glyphs host the final dance and open the living gateway.
+Serve this folder over HTTP (for example `python3 -m http.server 5173`). No application dependencies or build step are required.
 
-Keyboard: focus the fairy and press Enter or Space to begin. Arrow keys move the active fairy; Tab and Enter also explore individual lights. Reduced-motion preferences shorten choreography and disable continuous CSS motion.
+Move the mouse to guide the fairy. On touch screens, drag to move her. Double-click or double-tap the fairy to twirl; keyboard users can focus her and press Enter or Space. She always remains on Screen 1. Reduced-motion preferences disable idle animation and replace the twirl with a short opacity response.
 
-## Source layout
+- `index.html` / `style.css`: Figma composition, responsive layout, dialogue, gentle glow and idle movement.
+- `js/fairy.js`: position, following behavior and confirmation pose.
+- `js/main.js`: Screen 1 pointer/touch/keyboard input. The `fairy:twirl-complete` event is available for future screens; no transition is connected.
+- `assets/`: original Figma images and vector dialogue outline, plus locally hosted Manrope.
 
-- `js/main.js`: states, exploration, choreography, dialogue.
-- `js/patterns.js`: round configurations and exact route/glyph geometry.
-- `js/fairy.js`: original SVG fairy and poses.
-- `js/environment.js`: persistent procedural woodland and awakening layers.
-- `style.css`: responsive placement, typography, motion preferences.
+The previous multi-round experience is retained only in Git history. There are no later screens, discovery dots, particles, or navigation in the current implementation.
 
-All artwork is original SVG / canvas geometry. No external assets, fonts, analytics, or services are loaded.
+The GitHub Pages workflow publishes site files and assets from `main` when Pages is configured to use GitHub Actions.
 
-## Publishing
-
-The GitHub Actions workflow publishes `main` to GitHub Pages. In repository Settings → Pages, select **GitHub Actions** as the source. Only the site files are uploaded.
-
-## Journey regression check
-
-With Playwright installed in your development environment and a local server on port 5173, run `node tests/journey.cjs`. The check exercises every decoy and correct light, verifies all three rounds have exactly 12 lights, reaches the opened gateway, captures opening/final screenshots in the temporary directory, and fails on JavaScript errors.
+Run `node tests/screen-one.mjs` for deterministic input checks covering double-tap, double-click, dragging, cancelled gestures, and keyboard activation. Desktop and 390 × 844 layouts were also inspected in the browser, including live twirl and movement checks.
