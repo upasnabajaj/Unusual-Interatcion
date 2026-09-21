@@ -17,8 +17,11 @@
   object-fit: cover;
   pointer-events: none;
 }
+.selection-background:not(.selection-light) {
+  filter: brightness(0.22) saturate(0.65);
+}
 .selection-light {
-  filter: brightness(2.5) saturate(0.7);
+  filter: brightness(3.4) saturate(0.7);
   mask-image: radial-gradient(
     ellipse var(--selection-light-radius) var(--selection-light-radius) at
       var(--selection-light-x) var(--selection-light-y),

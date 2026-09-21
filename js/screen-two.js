@@ -79,6 +79,14 @@ export async function showScreenTwo(previous) {
   const selection = new FlowerSelection();
   const fairy = new SelectionFairy(scene);
   const options = scene.querySelector(".flower-options");
+  let leaving = false;
+  scene.addEventListener("fairy:twirl-complete", async () => {
+    if (!selection.ready || leaving) return;
+    leaving = true;
+    scene.inert = true;
+    const { showScreenThree } = await import("./screen-three.js");
+    await showScreenThree(scene, [...selection.selected]);
+  });
   for (const flower of flowers) {
     const button = document.createElement("button");
     button.type = "button";
