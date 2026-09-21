@@ -17,7 +17,9 @@ Keyboard: focus the fairy and press Enter or Space to begin. Arrow keys move the
 All artwork is original SVG / canvas geometry. No external assets, fonts, analytics, or services are loaded.
 
 ## Publishing
+
 The GitHub Actions workflow publishes `main` to GitHub Pages. In repository Settings → Pages, select **GitHub Actions** as the source. Only the site files are uploaded.
 
 ## Journey regression check
+
 With Playwright installed in your development environment and a local server on port 5173, run `node tests/journey.cjs`. The check exercises every decoy and correct light, verifies all three rounds have exactly 12 lights, reaches the opened gateway, captures opening/final screenshots in the temporary directory, and fails on JavaScript errors.

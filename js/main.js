@@ -167,7 +167,7 @@ async function awaken() {
   completed.push(flower);
   await animate(1600, (p) => {
     env.level = round + p;
-    partial.setAttribute("opacity", 0.9 - p * 0.79);
+    partial.setAttribute("opacity", 0.9 - p * 0.875);
   });
   active.el.classList.add("resting");
   active.el.setAttribute("aria-label", `Awakened ${config.name} fairy`);
@@ -212,7 +212,8 @@ async function finalDance() {
   phase = "gate";
   await animate(4300, (p) => {
     env.gate = p;
-    env.beam = 1 - p * 0.75;
+    env.beam = 1 - p;
+    env.spread = 1 - p * 0.85;
   });
   phase = "ending";
   document.querySelector("#accessible").textContent =
