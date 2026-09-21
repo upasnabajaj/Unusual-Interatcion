@@ -5,15 +5,10 @@ const fairy = new Fairy(scene);
 let down = null;
 let previousTap = null;
 
-scene.addEventListener("pointermove", (event) => {
-  if (event.pointerType === "mouse" || down)
-    fairy.moveTo(event.clientX, event.clientY);
-});
-
 scene.addEventListener("pointerdown", (event) => {
   if (!event.isPrimary || (event.pointerType === "mouse" && event.button !== 0))
     return;
-  // Touch can drag the character; only taps on her activate the response.
+  // Only taps on the fixed fairy activate the response. Drag gestures are ignored.
   const onFairy = fairy.figure.contains(event.target);
   down = {
     id: event.pointerId,

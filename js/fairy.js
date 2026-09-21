@@ -6,16 +6,11 @@ export class Fairy {
     this.figure = scene.querySelector("#fairy-turn");
     this.motion = matchMedia("(prefers-reduced-motion: reduce)");
     this.position = { x: 0, y: 0 };
-    this.target = { x: 0, y: 0 };
     this.scale = 1;
     this.twirlAnimation = null;
-    this.lastTime = 0;
-    this.frame = 0;
     this.resize = this.resize.bind(this);
-    this.render = this.render.bind(this);
     addEventListener("resize", this.resize);
     this.resize();
-    this.frame = requestAnimationFrame(this.render);
   }
 
   resize() {
@@ -23,59 +18,36 @@ export class Fairy {
     this.bounds = { width, height };
     if (width / height < 1) {
       this.scale = Math.min((width - 28) / 541, (height - 48) / 516, 1);
-      this.target = {
+      this.position = {
         x: (width - 541 * this.scale) / 2,
         y: (height - 516 * this.scale) / 2,
       };
     } else {
       this.scale = Math.min(width / 1440, height / 811);
-      this.target = {
+      this.position = {
         x: (width - 1440 * this.scale) / 2 + 450 * this.scale,
         y: (height - 811 * this.scale) / 2 + 148 * this.scale,
       };
     }
-    this.position = { ...this.target };
     this.paint();
-  }
-
-  moveTo(clientX, clientY) {
-    if (this.twirlAnimation) return;
-    const { left, top } = this.scene.getBoundingClientRect();
-    const inset = 10;
-    // Anchor the fairy's torso near the pointer; keep her speech in the viewport.
-    this.target.x = Math.max(
-      inset,
-      Math.min(
-        this.bounds.width - 541 * this.scale - inset,
-        clientX - left - 200 * this.scale,
-      ),
-    );
-    this.target.y = Math.max(
-      inset + 7,
-      Math.min(
-        this.bounds.height - 516 * this.scale - inset,
-        clientY - top - 230 * this.scale,
-      ),
-    );
   }
 
   paint() {
     this.rig.style.transform = `translate3d(${this.position.x}px, ${this.position.y}px, 0) scale(${this.scale})`;
-  }
-
-  render(time) {
-    const delta = Math.min(64, time - (this.lastTime || time));
-    this.lastTime = time;
-    const ease = this.motion.matches ? 1 : 1 - Math.exp(-delta / 72);
-    this.position.x += (this.target.x - this.position.x) * ease;
-    this.position.y += (this.target.y - this.position.y) * ease;
-    this.paint();
-    this.frame = requestAnimationFrame(this.render);
+    this.scene.style.setProperty(
+      "--light-x",
+      `${this.position.x + 180 * this.scale}px`,
+    );
+    this.scene.style.setProperty(
+      "--light-y",
+      `${this.position.y + 290 * this.scale}px`,
+    );
+    this.scene.style.setProperty("--light-radius", `${420 * this.scale}px`);
   }
 
   async twirl() {
     if (this.twirlAnimation) return;
-    this.target = { ...this.position };
+    this.position = { ...this.position };
     this.scene.dataset.state = "twirling";
     const frames = this.motion.matches
       ? [{ opacity: 1 }, { opacity: 0.72 }, { opacity: 1 }]
@@ -110,7 +82,6 @@ export class Fairy {
   }
 
   destroy() {
-    cancelAnimationFrame(this.frame);
     removeEventListener("resize", this.resize);
     this.twirlAnimation?.cancel();
   }

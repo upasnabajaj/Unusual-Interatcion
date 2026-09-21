@@ -26,10 +26,10 @@ body {
   overflow: hidden;
   isolation: isolate;
   touch-action: none;
-  cursor: none;
+  cursor: default;
 }
 #screen-one * {
-  cursor: none;
+  cursor: default;
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
@@ -49,13 +49,11 @@ body {
   width: 541px;
   height: 516px;
   transform-origin: 0 0;
-  will-change: transform;
 }
 .fairy-float {
   position: relative;
   width: 100%;
   height: 100%;
-  animation: float 6s ease-in-out infinite;
 }
 .fairy-turn {
   width: 296px;
@@ -71,7 +69,8 @@ body {
   width: 296px;
   height: 516px;
   overflow: hidden;
-  filter: drop-shadow(0 0 5px #ffffff38) drop-shadow(0 0 13px #e8edff17);
+  filter: drop-shadow(0 0 7px #ffffff50) drop-shadow(0 0 20px #e8edff22);
+  animation: float 6s ease-in-out infinite;
 }
 .fairy-layer {
   position: absolute;
@@ -151,8 +150,30 @@ body {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .fairy-float,
+  .fairy-art,
   .fairy-wing {
     animation: none;
   }
+}
+
+/* Reveal the actual environment texture around the fixed light source, rather
+   than putting an opaque halo over the artwork. Both images use the same crop. */
+.environment-light {
+  filter: brightness(2.35) saturate(0.8);
+  mask-image: radial-gradient(
+    ellipse var(--light-radius) calc(var(--light-radius) * 1.12) at
+      var(--light-x) var(--light-y),
+    #000 0%,
+    #000b 24%,
+    #0005 49%,
+    transparent 76%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse var(--light-radius) calc(var(--light-radius) * 1.12) at
+      var(--light-x) var(--light-y),
+    #000 0%,
+    #000b 24%,
+    #0005 49%,
+    transparent 76%
+  );
 }

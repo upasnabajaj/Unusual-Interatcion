@@ -41,7 +41,7 @@ await import(
   `data:text/javascript;base64,${Buffer.from(source).toString("base64")}`
 );
 const send = (type, options = {}) =>
-  listeners.get(type)({
+  listeners.get(type)?.({
     isPrimary: true,
     pointerId: 1,
     pointerType: "touch",
@@ -76,7 +76,7 @@ send("pointerdown");
 send("pointermove", { clientX: 400 });
 send("pointerup", { clientX: 400 });
 assert.equal(twirls, 2, "Dragging does not activate");
-assert.equal(moves, 1);
+assert.equal(moves, 0, "Dragging cannot move the fairy");
 send("pointerdown");
 send("pointercancel");
 send("pointerup");
