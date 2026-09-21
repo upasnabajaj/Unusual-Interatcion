@@ -51,3 +51,13 @@ fairy.figure.addEventListener("keydown", (event) => {
     fairy.twirl();
   }
 });
+
+// Screen 1 changes only after its existing confirmation twirl has completed.
+scene.addEventListener(
+  "fairy:twirl-complete",
+  async () => {
+    const { showScreenTwo } = await import("./screen-two.js");
+    await showScreenTwo(scene);
+  },
+  { once: true },
+);

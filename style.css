@@ -158,22 +158,26 @@ body {
 
 /* Reveal the actual environment texture around the fixed light source, rather
    than putting an opaque halo over the artwork. Both images use the same crop. */
+.environment:not(.environment-light) {
+  filter: brightness(0.28) saturate(0.65);
+}
+
 .environment-light {
-  filter: brightness(2.35) saturate(0.8);
+  filter: brightness(3.4) saturate(0.65);
   mask-image: radial-gradient(
     ellipse var(--light-radius) calc(var(--light-radius) * 1.12) at
       var(--light-x) var(--light-y),
     #000 0%,
-    #000b 24%,
-    #0005 49%,
-    transparent 76%
+    #000d 22%,
+    #0006 46%,
+    transparent 82%
   );
   -webkit-mask-image: radial-gradient(
     ellipse var(--light-radius) calc(var(--light-radius) * 1.12) at
       var(--light-x) var(--light-y),
     #000 0%,
-    #000b 24%,
-    #0005 49%,
-    transparent 76%
+    #000d 22%,
+    #0006 46%,
+    transparent 82%
   );
 }

@@ -2,8 +2,8 @@
 export class Fairy {
   constructor(scene) {
     this.scene = scene;
-    this.rig = scene.querySelector("#fairy-position");
-    this.figure = scene.querySelector("#fairy-turn");
+    this.rig = scene.querySelector(".fairy-position");
+    this.figure = scene.querySelector(".fairy-turn");
     this.motion = matchMedia("(prefers-reduced-motion: reduce)");
     this.position = { x: 0, y: 0 };
     this.scale = 1;

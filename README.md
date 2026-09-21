@@ -1,18 +1,31 @@
-# Unusual Interaction — Screen 1
+# Unusual Interaction
 
-Screen 1 is implemented from [Figma node 269:2](https://www.figma.com/design/vfHLFM7rPdrIF8UjVrL1Yt/test?node-id=269-2). The original background and fairy are separate, unchanged PNG assets. The original dialogue outline is SVG; its Manrope text is live HTML.
+Two Figma-based screens, implemented with separate original assets and live HTML/CSS controls. Serve this folder over HTTP, for example `python3 -m http.server 5173`. No application dependencies or build step are needed.
 
-Serve this folder over HTTP (for example `python3 -m http.server 5173`). No application dependencies or build step are required.
+## Screen 1
 
-The fairy and dialogue remain fixed in their responsive Figma positions. Pointer movement and dragging do not move them. A soft masked lighting layer reveals the original environment near the fairy. Double-click or double-tap the fairy to twirl; keyboard users can focus her and press Enter or Space. She always remains on Screen 1. Reduced-motion preferences disable idle animation and replace the twirl with a short opacity response.
+[Figma 269:2](https://www.figma.com/design/vfHLFM7rPdrIF8UjVrL1Yt/test?node-id=269-2).
+The fixed fairy and dialogue retain their original composition. The dark room is softly illuminated near her. Double-click or double-tap the fairy to twirl, then crossfade into Screen 2. Pointer movement and dragging never move her.
 
-- `index.html` / `style.css`: Figma composition, responsive layout, dialogue, gentle glow and idle movement.
-- `js/fairy.js`: fixed responsive position and confirmation pose.
-- `js/main.js`: Screen 1 pointer/touch/keyboard input. The `fairy:twirl-complete` event is available for future screens; no transition is connected.
-- `assets/`: original Figma images and vector dialogue outline, plus locally hosted Manrope.
+## Screen 2
 
-The previous multi-round experience is retained only in Git history. There are no later screens, discovery dots, particles, or navigation in the current implementation.
+[Figma 272:144](https://www.figma.com/design/vfHLFM7rPdrIF8UjVrL1Yt/test?node-id=272-144).
+Choose up to three flowers: Lotus, Rose, Jasmine, Daisy, Tulip and Lily. Click a selected flower to deselect it. At three selections, unselected flowers remain visible but cannot be added. Only selected flowers receive ivory illumination. The fairy responds to double-tap only with exactly three selections; her twirl returns to Screen 2. There is no Screen 3.
+
+The background and flower interiors use their original separate Figma PNG layers. The original raster circle is clipped out; circular outlines, heading, labels and selection controls are live HTML/CSS. The original fairy asset is reused, mirrored and scaled to Screen 2's reference. No full-screen screenshot is used.
+
+Keyboard users can Tab to flowers and activate with Enter or Space. The focused fairy responds to Enter or Space when available. Reduced-motion preferences disable idle movement and use shorter fades instead of rotational twirls.
+
+## Files
+
+- `style.css`: unchanged Screen 1 appearance and shared fairy artwork.
+- `screen-two.css`: isolated Screen 2 styling.
+- `js/main.js`: Screen 1 input and transition trigger.
+- `js/fairy.js`: shared fixed character layout and twirl.
+- `js/screen-two.js`: Screen 2 composition, selection controls and gated fairy input.
+- `js/selection.js`: three-flower selection rule.
+- `assets/`: original artwork, vector dialogue outline and locally hosted Manrope with its license.
+
+Run `node tests/screen-one.mjs` and `node tests/selection.mjs` for input and selection regression checks. Browser checks cover the transition, disabled fairy, three selections, fourth-selection rejection, replacement and the Screen 2 twirl.
 
 The GitHub Pages workflow publishes site files and assets from `main` when Pages is configured to use GitHub Actions.
-
-Run `node tests/screen-one.mjs` for deterministic input checks covering double-tap, double-click, dragging, cancelled gestures, and keyboard activation. Desktop and 390 × 844 layouts were also inspected in the browser, including live twirl and movement checks.
