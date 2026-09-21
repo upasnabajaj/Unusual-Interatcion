@@ -1,6 +1,6 @@
 # Unusual Interaction
 
-Two Figma-based screens, implemented with separate original assets and live HTML/CSS controls. Serve this folder over HTTP, for example `python3 -m http.server 5173`. No application dependencies or build step are needed.
+Three Figma-based screens, implemented with separate original assets and live HTML/CSS controls. Serve this folder over HTTP, for example `python3 -m http.server 5173`. No application dependencies or build step are needed.
 
 ## Screen 1
 
@@ -10,7 +10,7 @@ The fixed fairy and dialogue retain their original composition. The dark room is
 ## Screen 2
 
 [Figma 272:144](https://www.figma.com/design/vfHLFM7rPdrIF8UjVrL1Yt/test?node-id=272-144).
-Choose up to three flowers: Lotus, Rose, Jasmine, Daisy, Tulip and Lily. Click a selected flower to deselect it. At three selections, unselected flowers remain visible but cannot be added. Only selected flowers receive ivory illumination. The fairy responds to double-tap only with exactly three selections; her twirl returns to Screen 2. There is no Screen 3.
+Choose up to three flowers: Lotus, Rose, Jasmine, Daisy, Tulip and Lily. Click a selected flower to deselect it. At three selections, unselected flowers remain visible but cannot be added. Only selected flowers receive ivory illumination. The fairy responds to double-tap only with exactly three selections; her twirl transitions smoothly into Screen 3, carrying those exact three selections forward.
 
 The background and flower interiors use their original separate Figma PNG layers. The original raster circle is clipped out; circular outlines, heading, labels and selection controls are live HTML/CSS. The original fairy asset is reused, mirrored and scaled to Screen 2's reference. No full-screen screenshot is used.
 
@@ -29,3 +29,14 @@ Keyboard users can Tab to flowers and activate with Enter or Space. The focused 
 Run `node tests/screen-one.mjs` and `node tests/selection.mjs` for input and selection regression checks. Browser checks cover the transition, disabled fairy, three selections, fourth-selection rejection, replacement and the Screen 2 twirl.
 
 The GitHub Pages workflow publishes site files and assets from `main` when Pages is configured to use GitHub Actions.
+
+## Screen 3
+
+[Figma 272:150](https://www.figma.com/design/vfHLFM7rPdrIF8UjVrL1Yt/test?node-id=272-150).
+A new ruined chamber begins almost entirely dark. Drag the fairy (or focus her and use arrow keys) to move the local light. The initial dialogue fades and is removed on first movement. Only stones reached by her light are interactive. Eight stones begin dormant: three shuffled locations contain the exact selected flowers, five remain empty. Interacting reveals a pale engraving or softly awakens an empty stone. No later sequence, colouring, additional fairy or completion UI is implemented.
+
+`js/stones.js` owns the hidden assignments and discovery radius; `js/screen-three.js` owns pointer movement, lighting and transitions. `screen-three.css` is isolated from previous screen styles. Screen 1 source and styling are unchanged. Screen 2's only visual adjustment is darker background lighting; the selected glyph styling remains unchanged.
+
+`node tests/stones.mjs` verifies all 20 combinations of three distinct flowers, eight dormant stones, five empty stones and distance-gated discovery. The complete browser journey was tested with Lotus, Rose and Lily, discovering all eight stones and verifying those exact three engraving assets.
+
+See `assets/screen-three/ASSET-NOTES.md` for the dormant background preparation and original Figma source. The room is a separate image asset; light masking, fairy, dialogue, stone hit areas and engraving states are independent live elements.
