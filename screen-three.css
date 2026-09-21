@@ -103,38 +103,9 @@
 .exploration-stone:disabled {
   cursor: default;
 }
-.exploration-stone.discovered {
-  background: radial-gradient(ellipse, #e5e5d719, transparent 72%);
-  box-shadow:
-    inset 0 0 18px #eee8d11a,
-    0 0 17px #f5eed609;
-}
 .exploration-stone:focus-visible {
   outline: 1px solid #e9e7df66;
   outline-offset: 2px;
-}
-.stone-engraving {
-  position: absolute;
-  left: 12%;
-  top: -22%;
-  width: 76%;
-  height: 144%;
-  object-fit: fill;
-  clip-path: circle(42%);
-  filter: grayscale(1) brightness(0.85);
-  opacity: 0.65;
-  pointer-events: none;
-  animation: engrave 1.5s ease both;
-}
-@keyframes engrave {
-  from {
-    opacity: 0;
-    filter: grayscale(1) brightness(0.3);
-  }
-  to {
-    opacity: 0.65;
-    filter: grayscale(1) brightness(0.85);
-  }
 }
 @media (prefers-reduced-motion: reduce) {
   .stone-engraving {
@@ -143,4 +114,118 @@
   .exploration-stone {
     transition: none;
   }
+}
+/* Stone light is a masked copy of the room, so texture and vegetation respond. */
+.stone-spill {
+  filter: brightness(3.1) saturate(0.65);
+  opacity: 0;
+  mask-image: radial-gradient(
+    ellipse var(--spill-w) 145px at var(--spill-x) var(--spill-y),
+    #000 0%,
+    #000b 32%,
+    transparent 100%
+  );
+}
+.stone-ground-light {
+  position: absolute;
+  pointer-events: none;
+  background: radial-gradient(ellipse, var(--flower-colour), transparent 68%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  filter: blur(15px);
+}
+.fairy-pose {
+  width: 139px;
+  height: 243px;
+  transform-origin: 62% 55%;
+  filter: drop-shadow(0 0 7px var(--fairy-colour, #ffffff60));
+}
+.explorer.resting {
+  pointer-events: none;
+  cursor: default;
+}
+.tint-definitions {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.stone-mark {
+  position: absolute;
+  inset: 4% 12%;
+  pointer-events: none;
+}
+.stone-engraving,
+.engraving-energy {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  clip-path: ellipse(42% 42% at 50% 50%);
+  animation: none;
+}
+.stone-engraving {
+  filter: grayscale(1) brightness(0.5);
+  opacity: 0.23;
+}
+.engraving-energy {
+  background: conic-gradient(
+    from -90deg,
+    var(--flower-colour) calc(var(--charge) * 1turn),
+    transparent 0
+  );
+  mask-image: var(--engraving);
+  mask-size: 100% 100%;
+  filter: drop-shadow(0 0 3px var(--flower-colour));
+  opacity: 0.95;
+}
+.stone-number {
+  display: block;
+  font:
+    32px Georgia,
+    serif;
+  transform: scaleY(0.65);
+  color: #c0bdb4;
+  opacity: 0.19;
+  text-shadow:
+    1px 2px 1px #000,
+    -1px -1px 1px #ffffff18;
+  transition:
+    opacity 1.8s,
+    color 1.8s;
+}
+.exploration-stone.awakened {
+  background: radial-gradient(ellipse, #ede8d015, transparent 72%);
+  box-shadow:
+    inset 0 0 18px #eee8d119,
+    0 0 20px #f5eed60b;
+}
+.awakened .stone-number {
+  opacity: 0.65;
+  color: #f3eddf;
+  text-shadow: 0 0 8px #eee7cc80;
+}
+.awakened .engraving-energy {
+  filter: drop-shadow(0 0 5px var(--flower-colour))
+    brightness(calc(1 + var(--final-energy, 0) * 0.25));
+}
+.birth-orb {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--orb-colour, #fff);
+  box-shadow:
+    0 0 9px 4px var(--orb-colour, #fff),
+    0 0 25px 10px #eee6ff28;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+}
+.magic-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
