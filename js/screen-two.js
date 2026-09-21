@@ -85,7 +85,7 @@ export async function showScreenTwo(previous) {
     if (!selection.ready || leaving) return;
     leaving = true;
     scene.inert = true;
-    const { showScreenThree } = await import("./screen-three.js");
+    const { showScreenThree } = await import("./screen-three.js?v=dialogue-2");
     await showScreenThree(scene, [...selection.selected]);
   });
   for (const flower of flowers) {
