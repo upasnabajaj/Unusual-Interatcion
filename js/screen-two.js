@@ -65,6 +65,7 @@ export async function showScreenTwo(previous) {
     <div class="selection-stage">
       <h1>Choose Any Three Flowers.</h1>
       <div class="flower-options" aria-label="Flowers"></div>
+      <div class="selection-dialogue" aria-hidden="true"><img src="assets/screen-three/dialogue.svg" alt=""><p>Tap me twice<br>to move next.</p></div>
       <div class="fairy-position selection-fairy">
         <div class="fairy-turn" role="button" tabindex="0" aria-label="Fairy. Double-tap to twirl" aria-disabled="true">
           <div class="fairy-size"><div class="fairy-mirror"><div class="fairy-art" aria-hidden="true">
@@ -108,6 +109,9 @@ export async function showScreenTwo(previous) {
         );
       }
       fairy.figure.setAttribute("aria-disabled", String(!selection.ready));
+      scene
+        .querySelector(".selection-dialogue")
+        .setAttribute("aria-hidden", String(!selection.ready));
     });
     options.append(button);
   }

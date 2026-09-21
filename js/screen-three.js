@@ -17,7 +17,7 @@ export async function showScreenThree(previous, selected) {
     <img class="exploration-background torch-room" src="${BG}" alt="" draggable="false">
     <div class="stone-lights"></div><div class="exploration-stones"></div><div class="exploration-fairies"></div>
     <div class="birth-orb" aria-hidden="true"></div>
-    <div class="exploration-dialogue"><img src="assets/screen-three/dialogue.svg" alt=""><p>Stay close.<br>I’ll light the way.</p></div>
+    <div class="exploration-dialogue"><img src="assets/screen-three/dialogue.svg" alt=""><p>Move with me.<br>Let’s see what’s hidden</p></div>
   </div><canvas class="magic-canvas" aria-hidden="true"></canvas>`;
   document.body.append(scene);
   const world = scene.querySelector(".exploration-world"),
