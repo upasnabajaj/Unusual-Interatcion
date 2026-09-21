@@ -1,2 +1,31 @@
 <!doctype html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#03070e"><title>The sleeping grove</title><link rel="stylesheet" href="style.css"></head><body><main aria-label="The sleeping grove, an interactive fairy experience"><canvas id="world" aria-hidden="true"></canvas><svg id="paths" viewBox="0 0 1440 900" preserveAspectRatio="none" aria-hidden="true"><defs><filter id="soft"><feGaussianBlur stdDeviation="3"/></filter></defs><g id="glyphs"></g></svg><div id="dots" aria-label="Explore the lights"></div><div id="fairies"></div><p id="speech" role="status"></p><p id="accessible" class="sr-only" aria-live="polite"></p></main><script type="module" src="js/main.js"></script></body></html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#03070e" />
+    <title>The sleeping grove</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main aria-label="The sleeping grove, an interactive fairy experience">
+      <canvas id="world" aria-hidden="true"></canvas
+      ><svg
+        id="paths"
+        viewBox="0 0 1440 900"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <defs>
+          <filter id="soft"><feGaussianBlur stdDeviation="3" /></filter>
+        </defs>
+        <g id="glyphs"></g>
+      </svg>
+      <div id="dots" aria-label="Explore the lights"></div>
+      <div id="fairies"></div>
+      <p id="speech" role="status"></p>
+      <p id="accessible" class="sr-only" aria-live="polite"></p>
+    </main>
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
