@@ -45,11 +45,19 @@ export function discoverStone(stone, light) {
 export class AwakeningSession {
   constructor(selected, random = Math.random) {
     this.stones = createStones(selected, random);
+    this.selectionOrder = [...selected];
     this.phase = "exploring";
     this.owners = [];
     this.activeFairy = 0;
     this.currentStone = null;
     this.roundsCompleted = 0;
+  }
+  isTarget(stone) {
+    return (
+      this.phase === "exploring" &&
+      !stone.awakened &&
+      stone.flower === this.selectionOrder[this.activeFairy]
+    );
   }
   awakenNormal(index, light) {
     const stone = this.stones[index];
@@ -70,6 +78,7 @@ export class AwakeningSession {
       this.phase !== "exploring" ||
       this.owners.length >= 3 ||
       !stone?.flower ||
+      !this.isTarget(stone) ||
       stone.awakened ||
       !discoverStone(stone, light)
     )

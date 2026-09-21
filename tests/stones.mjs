@@ -29,7 +29,8 @@ console.log(
 );
 
 for (let trial = 0; trial < 40; trial++) {
-  const session = new AwakeningSession(["Lotus", "Rose", "Lily"]);
+  const selectedOrder = [["Lotus", "Rose", "Lily"], ["Rose", "Lily", "Lotus"], ["Lily", "Lotus", "Rose"]][trial % 3];
+  const session = new AwakeningSession(selectedOrder);
   const mapping = session.stones.map((s) => s.flower);
   assert.equal(session.startFinale(), false);
   for (const [i, s] of session.stones.entries())
@@ -37,12 +38,18 @@ for (let trial = 0; trial < 40; trial++) {
       assert.equal(session.awakenNormal(i, s), true);
       assert.equal(session.awakenNormal(i, s), false);
     }
-  const order = session.stones
-    .map((s, i) => (s.flower ? i : -1))
-    .filter((i) => i >= 0)
-    .sort(() => Math.random() - 0.5);
+  const order = session.selectionOrder.map((name) =>
+    session.stones.findIndex((s) => s.flower === name),
+  );
   for (const [n, i] of order.entries()) {
     const s = session.stones[i];
+    assert.equal(
+      session.stones.filter((stone) => session.isTarget(stone)).length,
+      1,
+    );
+    for (const other of order.filter((j) => j !== i))
+      assert.equal(session.beginFlower(other, session.stones[other]), false);
+
     assert.equal(session.beginFlower(i, { x: -1000, y: -1000 }), false);
     assert.equal(session.beginFlower(i, s), true);
     assert.equal(session.beginFlower(i, s), false);
@@ -67,5 +74,5 @@ for (let trial = 0; trial < 40; trial++) {
   assert.ok(session.stones.every((s) => s.awakened));
 }
 console.log(
-  "PASS: stable assignment, discovery ownership, activation locks, three fairies, exactly three rounds and terminal veil",
+  "PASS: stable assignment, selection-order ownership, activation locks, three fairies, exactly three rounds and terminal veil",
 );

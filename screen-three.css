@@ -165,8 +165,8 @@
   animation: none;
 }
 .stone-engraving {
-  filter: grayscale(1) brightness(0.5);
-  opacity: 0.23;
+  filter: grayscale(1) brightness(0.95);
+  opacity: 0.8;
 }
 .engraving-energy {
   background: conic-gradient(
@@ -179,31 +179,11 @@
   filter: drop-shadow(0 0 3px var(--flower-colour));
   opacity: 0.95;
 }
-.stone-number {
-  display: block;
-  font:
-    32px Georgia,
-    serif;
-  transform: scaleY(0.65);
-  color: #c0bdb4;
-  opacity: 0.19;
-  text-shadow:
-    1px 2px 1px #000,
-    -1px -1px 1px #ffffff18;
-  transition:
-    opacity 1.8s,
-    color 1.8s;
-}
 .exploration-stone.awakened {
   background: radial-gradient(ellipse, #ede8d015, transparent 72%);
   box-shadow:
     inset 0 0 18px #eee8d119,
     0 0 20px #f5eed60b;
-}
-.awakened .stone-number {
-  opacity: 0.65;
-  color: #f3eddf;
-  text-shadow: 0 0 8px #eee7cc80;
 }
 .awakened .engraving-energy {
   filter: drop-shadow(0 0 5px var(--flower-colour))
@@ -228,4 +208,16 @@
   width: 100%;
   height: 100%;
   pointer-events: none;
+}
+
+/* Only the active fairy’s assigned engraving offers a pale guiding light. */
+.current-target .stone-engraving {
+  opacity: 1;
+  filter: grayscale(1) brightness(1.35) drop-shadow(0 0 4px #fff4da80);
+}
+
+.rock-awakening {
+  box-shadow:
+    inset 0 0 28px #fff4df40,
+    0 0 28px #fff4df30;
 }

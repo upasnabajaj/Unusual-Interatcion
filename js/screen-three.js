@@ -1,4 +1,4 @@
-import { AwakeningSession, flowerColours } from "./stones.js";
+import { AwakeningSession, flowerColours } from "./stones.js?v=stone-orbit-1";
 import { MagicEffects } from "./magic-effects.js";
 
 const BG = "assets/screen-three/six-stone-environment.png";
@@ -41,10 +41,10 @@ export async function showScreenThree(previous, selected) {
   const sync = () => {
     scene.dataset.state = session.phase;
   };
-  const animate = (ms, update) =>
+  const animate = (ms, update, preserveDuration = false) =>
     new Promise((resolve) => {
       let start;
-      const duration = reduced ? Math.min(ms, 900) : ms;
+      const duration = reduced && !preserveDuration ? Math.min(ms, 900) : ms;
       function tick(t) {
         start ??= t;
         const p = Math.min(1, (t - start) / duration);
@@ -165,7 +165,7 @@ export async function showScreenThree(previous, selected) {
     el.disabled = true;
     el.setAttribute(
       "aria-label",
-      stone.flower ? "Faint engraving" : `Stone ${stone.number}`,
+      stone.flower ? "Faint engraving" : "Dormant stone",
     );
     const colour = stone.flower ? flowerColours[stone.flower] : "#efe9d9";
     stone.colour = colour;
@@ -173,8 +173,7 @@ export async function showScreenThree(previous, selected) {
     if (stone.flower) {
       const src = `assets/screen-two/${stone.flower.toLowerCase()}.png`;
       el.innerHTML = `<span class="stone-mark"><img class="stone-engraving" src="${src}" alt="" draggable="false"><span class="engraving-energy" style="--engraving:url('${src}')"></span></span>`;
-    } else
-      el.innerHTML = `<span class="stone-number" aria-hidden="true">${stone.number}</span>`;
+    }
     el.addEventListener("click", () => activate(index));
     scene.querySelector(".exploration-stones").append(el);
     const spill = document.createElement("img");
@@ -225,10 +224,7 @@ export async function showScreenThree(previous, selected) {
     if (!stone.flower) {
       if (session.awakenNormal(index, p)) {
         stoneElements[index].classList.add("awakened");
-        stoneElements[index].setAttribute(
-          "aria-label",
-          `Awakened stone ${stone.number}`,
-        );
+        stoneElements[index].setAttribute("aria-label", "Awakened stone");
         effects.emit(stone.x, stone.y, stone.colour, 7, 0.4);
       }
       return;
@@ -242,33 +238,23 @@ export async function showScreenThree(previous, selected) {
     active.el.classList.remove("dragging");
     const f = active;
     await move(f, stone.x - 86, stone.y - 139, 950);
-    await animate(3400, (t) => {
-      stone.charge = t;
-      stoneElements[index].style.setProperty("--charge", String(t));
-      if (Math.random() < 0.35 && !reduced)
-        effects.emit(
-          stone.x + Math.cos(t * 6.283) * stone.w * 0.25,
-          stone.y + Math.sin(t * 6.283) * stone.h * 0.25,
-          stone.colour,
-          1,
-          0.2,
-        );
+    // Pause at her own stone before its ivory light awakens.
+    await animate(2000, () => {}, true);
+    stoneElements[index].classList.add("rock-awakening");
+    await animate(1300, (t) => {
+      stone.rockLight = t;
     });
-    session.completeFlower();
-    sync();
-    stoneElements[index].classList.add("awakened");
-    stoneElements[index].setAttribute(
-      "aria-label",
-      `Awakened ${stone.flower} engraving`,
-    );
-    const dest = centre(f);
-    await animate(1100, (t) => {
-      const x = stone.x + (dest.x - stone.x) * t + Math.sin(t * Math.PI) * 24,
-        y = stone.y + (dest.y - 36 - stone.y) * t;
-      orb.style.cssText = `opacity:${Math.sin(t * Math.PI)};left:${x}px;top:${y}px;--orb-colour:${stone.colour};`;
-      effects.emit(x, y, stone.colour, reduced ? 0 : 2, 0.3);
+    // One complete circuit of the six-stone arrangement, then return home.
+    const startAngle = Math.atan2((stone.y - 470) / 158, (stone.x - 720) / 505);
+    const entry = orbit(startAngle, 0);
+    await move(f, entry.x, entry.y, 1600);
+    await animate(12500, (t) => {
+      const point = orbit(startAngle + t * Math.PI * 2, 0);
+      f.x = point.x;
+      f.y = point.y;
+      position(f);
     });
-    orb.style.opacity = "0";
+    await move(f, stone.x - 86, stone.y - 139, 1700);
     const pose = f.el.querySelector(".fairy-pose");
     const spin = pose.animate(
       reduced
@@ -285,8 +271,20 @@ export async function showScreenThree(previous, selected) {
     );
     await Promise.all([
       spin.finished,
-      animate(1800, (t) => tint(f, stone.colour, t)),
+      animate(1800, (t) => {
+        tint(f, stone.colour, t);
+        stone.charge = t;
+        stoneElements[index].style.setProperty("--charge", String(t));
+        stone.halo.style.setProperty("--flower-colour", stone.colour);
+      }),
     ]);
+    session.completeFlower();
+    stoneElements[index].classList.remove("rock-awakening");
+    stoneElements[index].classList.add("awakened");
+    stoneElements[index].setAttribute(
+      "aria-label",
+      `Awakened ${stone.flower} engraving`,
+    );
     f.colour = stone.colour;
     f.resting = true;
     f.el.classList.add("resting");
@@ -394,14 +392,23 @@ export async function showScreenThree(previous, selected) {
     world.style.setProperty("--torch-y", `${p.y}px`);
     stones.forEach((stone, i) => {
       const d = Math.hypot(stone.x - p.x, stone.y - p.y);
-      const ambient = stone.awakened ? 0.85 : 0.008;
+      const target = session.isTarget(stone);
+      stoneElements[i].classList.toggle("current-target", target);
+      const ambient = stone.awakened ? 0.85 : target ? 0.65 : 0.008;
       stoneElements[i].style.setProperty(
         "--stone-light",
         String(Math.max(ambient, (1 - d / 230) * 0.7)),
       );
       stoneElements[i].disabled =
-        session.phase !== "exploring" || d > 190 || stone.awakened;
-      const energy = stone.awakened ? 0.6 : stone.charge * 0.5;
+        session.phase !== "exploring" ||
+        d > 190 ||
+        stone.awakened ||
+        (stone.flower && !target);
+      const energy = stone.awakened
+        ? 0.6
+        : Math.max(stone.charge * 0.5, (stone.rockLight || 0) * 0.75);
+      if (!stone.charge)
+        stone.halo.style.setProperty("--flower-colour", "#efe9d9");
       stone.spill.style.opacity = String(
         Math.min(
           1,
@@ -437,7 +444,10 @@ export async function showScreenThree(previous, selected) {
       active.y += (active.target.y - active.y) * follow;
       const p = centre(active),
         index = stones.findIndex(
-          (s) => !s.awakened && Math.hypot(s.x - p.x, s.y - p.y) < 48,
+          (s) =>
+            !s.awakened &&
+            (!s.flower || session.isTarget(s)) &&
+            Math.hypot(s.x - p.x, s.y - p.y) < 48,
         );
       if (index >= 0) {
         if (holdStone !== index) {
@@ -445,7 +455,7 @@ export async function showScreenThree(previous, selected) {
           hold = 0;
         }
         hold += dt;
-        if (hold > (stones[index].flower ? 950 : 500)) activate(index);
+        if (hold > (stones[index].flower ? 100 : 500)) activate(index);
       } else {
         hold = 0;
         holdStone = -1;
