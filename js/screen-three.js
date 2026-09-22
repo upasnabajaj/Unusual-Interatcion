@@ -438,7 +438,10 @@ export async function showScreenThree(previous, selected) {
             phase = (phase + 1) % 1;
             if (!stone.flower && t >= phase && !stone.awakened) {
               session.awakenNormal(i, stone);
-              stoneElements[i].setAttribute("aria-label", "Awakened empty stone");
+              stoneElements[i].setAttribute(
+                "aria-label",
+                "Awakened empty stone",
+              );
               stoneElements[i].classList.add("awakened", "empty-awakened");
             }
           });

@@ -312,3 +312,18 @@
     transition: none;
   }
 }
+/* Keep the final colour in the engraved light, with restrained living blooms. */
+.awakened .stone-engraving {
+  opacity: 0.16;
+}
+.awakened .engraving-energy {
+  filter: saturate(1.35) drop-shadow(0 0 5px var(--flower-colour))
+    brightness(calc(1 + var(--final-energy, 0) * 0.15));
+}
+.world-awakened .awakened-botany {
+  opacity: 0.45;
+}
+.awakened-botany svg {
+  width: 68px;
+  height: 47px;
+}
