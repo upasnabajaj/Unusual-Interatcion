@@ -221,3 +221,94 @@
     inset 0 0 28px #fff4df40,
     0 0 28px #fff4df30;
 }
+/* Awaken the same room; every character and engraving stays a separate layer. */
+.torch-room {
+  mask-image: radial-gradient(
+    ellipse var(--torch-radius, 230px) var(--torch-radius, 230px) at
+      var(--torch-x) var(--torch-y),
+    #000 0%,
+    #000a 35%,
+    transparent 100%
+  );
+}
+.dormant-room {
+  transition: filter 2s ease;
+}
+.world-awakened .dormant-room {
+  filter: brightness(1.65) saturate(0.8);
+}
+.world-awakened .torch-room {
+  opacity: 0;
+}
+.final-fairy-light {
+  opacity: 0;
+  filter: brightness(2.8) saturate(0.75);
+  mask-image: radial-gradient(
+    ellipse 180px 200px at var(--light-x) var(--light-y),
+    #0008,
+    transparent 100%
+  );
+}
+.final-coloured-light {
+  position: absolute;
+  width: 300px;
+  height: 190px;
+  background: radial-gradient(ellipse, var(--aura), transparent 68%);
+  opacity: 0;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  filter: blur(18px);
+}
+.world-awakened .final-fairy-light {
+  opacity: 1;
+}
+.world-awakened .final-coloured-light {
+  opacity: 0.13;
+}
+.empty-awakened::after {
+  content: "";
+  position: absolute;
+  inset: 10% 7%;
+  border: 1.5px solid #fff5debd;
+  border-radius: 46% 54% 49% 51%;
+  box-shadow:
+    0 0 9px #fff3da85,
+    inset 0 0 8px #fff4da50;
+  pointer-events: none;
+}
+.awakened-botany {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 2s;
+  pointer-events: none;
+}
+.awakened-botany svg {
+  position: absolute;
+  transform-origin: bottom center;
+  animation: bloom-sway 7s ease-in-out infinite alternate;
+  animation-delay: var(--bloom-delay);
+}
+.world-awakened .awakened-botany {
+  opacity: 0.7;
+}
+@keyframes bloom-sway {
+  to {
+    transform: rotate(2deg);
+  }
+}
+.world-awakened .stone-ground-light {
+  background:
+    repeating-linear-gradient(177deg, transparent 0 8px, #0002 9px 11px),
+    radial-gradient(ellipse, var(--flower-colour), transparent 68%);
+  height: 230px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .awakened-botany svg {
+    animation: none;
+  }
+  .dormant-room,
+  .awakened-botany {
+    transition: none;
+  }
+}

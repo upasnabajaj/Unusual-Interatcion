@@ -1,4 +1,7 @@
-import { AwakeningSession, flowerColours } from "./stones.js?v=stone-orbit-1";
+import {
+  AwakeningSession,
+  flowerColours,
+} from "./stones.js?v=awakened-world-1";
 import { MagicEffects } from "./magic-effects.js";
 
 const BG = "assets/screen-three/six-stone-environment.png";
@@ -15,6 +18,7 @@ export async function showScreenThree(previous, selected) {
   scene.innerHTML = `<div class="exploration-world">
     <img class="exploration-background dormant-room" src="${BG}" alt="" draggable="false">
     <img class="exploration-background torch-room" src="${BG}" alt="" draggable="false">
+    <div class="awakened-botany" aria-hidden="true"></div><div class="final-fairy-lights"></div>
     <div class="stone-lights"></div><div class="exploration-stones"></div><div class="exploration-fairies"></div>
     <div class="birth-orb" aria-hidden="true"></div>
     <div class="exploration-dialogue"><img src="assets/screen-three/dialogue.svg" alt=""><p>Move with me.<br>Let’s see what’s hidden</p></div>
@@ -29,6 +33,36 @@ export async function showScreenThree(previous, selected) {
     reduced,
   );
   const fairies = [];
+  const canMove = (f) =>
+    session.phase === "awakened" ||
+    (session.phase === "exploring" && f === active);
+  // Small live blossoms follow the existing vegetation, never stone patterns.
+  const planting = [
+    [100, 390],
+    [170, 520],
+    [245, 670],
+    [1190, 430],
+    [1300, 570],
+    [1200, 710],
+    [550, 720],
+    [890, 735],
+  ];
+  scene.querySelector(".awakened-botany").innerHTML = planting
+    .map(
+      ([x, y], i) =>
+        `<svg style="left:${x}px;top:${y}px;--bloom-delay:${i * 0.17}s" width="95" height="65" viewBox="0 0 95 65"><path d="M45 65 Q35 30 15 15 M45 65 Q60 25 77 20" fill="none" stroke="#526452" stroke-width="1.2"/>${[
+          [15, 15],
+          [35, 39],
+          [77, 20],
+          [58, 45],
+        ]
+          .map(
+            ([cx, cy]) =>
+              `<g transform="translate(${cx} ${cy})">${[0, 72, 144, 216, 288].map((a) => `<ellipse rx="2.5" ry="6" transform="rotate(${a}) translate(0 -4)" fill="${i % 2 ? "#aa8fba" : "#cda6a7"}"/>`).join("")}<circle r="1.5" fill="#e7d6b3"/></g>`,
+          )
+          .join("")}</svg>`,
+    )
+    .join("");
   let active,
     scale = 1,
     drag = null,
@@ -37,7 +71,8 @@ export async function showScreenThree(previous, selected) {
     holdStone = -1,
     bubbleGone = false,
     finalEnergy = 0,
-    emission = 0;
+    emission = 0,
+    handoffLight = null;
   const sync = () => {
     scene.dataset.state = session.phase;
   };
@@ -86,19 +121,24 @@ export async function showScreenThree(previous, selected) {
       resting: false,
     };
     fairies.push(f);
+    const light = document.createElement("img");
+    light.src = BG;
+    light.alt = "";
+    light.className = "exploration-background final-fairy-light";
+    const aura = document.createElement("div");
+    aura.className = "final-coloured-light";
+    scene.querySelector(".final-fairy-lights").append(light, aura);
+    f.light = light;
+    f.aura = aura;
     el.querySelector(".explorer-scale").style.filter = `url(#fairy-tint-${id})`;
     if (materialising) {
       el.style.opacity = "0";
       el.style.pointerEvents = "none";
     }
     el.addEventListener("pointerdown", (event) => {
-      if (
-        f !== active ||
-        session.phase !== "exploring" ||
-        !event.isPrimary ||
-        event.button > 0
-      )
-        return;
+      if (!canMove(f) || !event.isPrimary || event.button > 0) return;
+      if (drag) return;
+      active = f;
       drag = {
         id: event.pointerId,
         x: event.clientX,
@@ -110,13 +150,7 @@ export async function showScreenThree(previous, selected) {
       el.classList.add("dragging");
     });
     el.addEventListener("pointermove", (event) => {
-      if (
-        f !== active ||
-        !drag ||
-        drag.id !== event.pointerId ||
-        session.phase !== "exploring"
-      )
-        return;
+      if (!canMove(f) || !drag || drag.id !== event.pointerId) return;
       const dx = (event.clientX - drag.x) / scale,
         dy = (event.clientY - drag.y) / scale;
       if (Math.hypot(dx, dy) > 3) hideDialogue();
@@ -133,7 +167,7 @@ export async function showScreenThree(previous, selected) {
     el.addEventListener("pointerup", release);
     el.addEventListener("pointercancel", release);
     el.addEventListener("keydown", (event) => {
-      if (f !== active || session.phase !== "exploring") return;
+      if (!canMove(f)) return;
       const delta = {
         ArrowLeft: [-32, 0],
         ArrowRight: [32, 0],
@@ -221,14 +255,7 @@ export async function showScreenThree(previous, selected) {
     const stone = stones[index];
     if (stone.awakened) return;
     const p = centre(active);
-    if (!stone.flower) {
-      if (session.awakenNormal(index, p)) {
-        stoneElements[index].classList.add("awakened");
-        stoneElements[index].setAttribute("aria-label", "Awakened stone");
-        effects.emit(stone.x, stone.y, stone.colour, 7, 0.4);
-      }
-      return;
-    }
+    if (!stone.flower) return;
     // A nearby stone click carries her onto it; a drag-and-hold does the same.
     if (!session.beginFlower(index, p)) return;
     sync();
@@ -241,20 +268,23 @@ export async function showScreenThree(previous, selected) {
     // Pause at her own stone before its ivory light awakens.
     await animate(2000, () => {}, true);
     stoneElements[index].classList.add("rock-awakening");
-    await animate(1300, (t) => {
+    await animate(1000, (t) => {
       stone.rockLight = t;
     });
-    // One complete circuit of the six-stone arrangement, then return home.
-    const startAngle = Math.atan2((stone.y - 470) / 158, (stone.x - 720) / 505);
-    const entry = orbit(startAngle, 0);
-    await move(f, entry.x, entry.y, 1600);
-    await animate(12500, (t) => {
-      const point = orbit(startAngle + t * Math.PI * 2, 0);
-      f.x = point.x;
-      f.y = point.y;
-      position(f);
+    await animate(1700, (t) => {
+      stone.charge = t;
+      stoneElements[index].style.setProperty("--charge", String(t));
+      stone.halo.style.setProperty("--flower-colour", stone.colour);
     });
-    await move(f, stone.x - 86, stone.y - 139, 1700);
+    session.completeFlower();
+    sync();
+    const heart = centre(f);
+    await animate(650, (t) => {
+      const y = stone.y - 45 * t;
+      orb.style.cssText = `left:${heart.x}px;top:${y}px;opacity:${Math.sin(t * Math.PI)};--orb-colour:${stone.colour}`;
+      if (!reduced) effects.emit(heart.x, y, stone.colour, 1, 0.2);
+    });
+    orb.style.opacity = "0";
     const pose = f.el.querySelector(".fairy-pose");
     const spin = pose.animate(
       reduced
@@ -273,12 +303,9 @@ export async function showScreenThree(previous, selected) {
       spin.finished,
       animate(1800, (t) => {
         tint(f, stone.colour, t);
-        stone.charge = t;
-        stoneElements[index].style.setProperty("--charge", String(t));
         stone.halo.style.setProperty("--flower-colour", stone.colour);
       }),
     ]);
-    session.completeFlower();
     stoneElements[index].classList.remove("rock-awakening");
     stoneElements[index].classList.add("awakened");
     stoneElements[index].setAttribute(
@@ -286,6 +313,15 @@ export async function showScreenThree(previous, selected) {
       `Awakened ${stone.flower} engraving`,
     );
     f.colour = stone.colour;
+    // A compact orbit around her own stone; no light spills onto future targets.
+    const home = { x: stone.x - 86, y: stone.y - 139 };
+    await animate(2200, (t) => {
+      const angle = t * Math.PI * 2;
+      f.x = home.x + Math.sin(angle) * 48;
+      f.y = home.y + (1 - Math.cos(angle)) * 16;
+      position(f);
+    });
+    f.target = { x: f.x, y: f.y };
     f.resting = true;
     f.el.classList.add("resting");
     f.el.tabIndex = -1;
@@ -296,23 +332,37 @@ export async function showScreenThree(previous, selected) {
       f,
       stone.x + stone.w * 0.38 - 69,
       Math.max(15, stone.y - 249),
-      1700,
+      1050,
     );
     if (session.phase === "birthing") await birth(f);
     else await finale();
   }
   async function birth(parent) {
-    const start = centre(parent),
-      tx = Math.max(
-        170,
-        Math.min(1170, start.x + (start.x > 750 ? -220 : 220)),
-      ),
-      ty = Math.max(170, start.y - 100);
+    const start = centre(parent);
+    // Use open space separated from every resting fairy, without moving them.
+    const candidates = [
+      { x: 420, y: 160 },
+      { x: 720, y: 160 },
+      { x: 1020, y: 160 },
+    ];
+    const clearance = (point) =>
+      Math.min(
+        ...fairies.map((f) => {
+          const c = centre(f);
+          return Math.hypot(point.x - c.x, point.y - c.y);
+        }),
+      );
+    const destination = candidates.reduce((best, p) =>
+      clearance(p) > clearance(best) ? p : best,
+    );
+    const tx = destination.x,
+      ty = destination.y;
     orb.style.setProperty("--orb-colour", "#faf7ff");
-    await animate(2600, (t) => {
+    await animate(1700, (t) => {
       const p = ease(t),
         x = start.x + (tx - start.x) * p,
         y = start.y + (ty - start.y) * p - Math.sin(t * Math.PI) * 45;
+      handoffLight = { x, y };
       orb.style.left = `${x}px`;
       orb.style.top = `${y}px`;
       orb.style.opacity = String(Math.min(1, t * 4));
@@ -320,7 +370,7 @@ export async function showScreenThree(previous, selected) {
       if (!reduced) effects.emit(x, y, "#eee6ff", 1, 0.25);
     });
     const next = createFairy(tx - 86, ty - 139, true);
-    await animate(1800, (t) => {
+    await animate(1200, (t) => {
       next.el.style.opacity = String(t);
       next.el.querySelector(".fairy-pose").style.transform =
         `scale(${0.2 + 0.8 * ease(t)})`;
@@ -333,6 +383,20 @@ export async function showScreenThree(previous, selected) {
     next.el.tabIndex = 0;
     next.el.querySelector(".fairy-pose").style.transform = "";
     active = next;
+    handoffLight = null;
+    const arrival = next.el.querySelector(".fairy-pose");
+    await arrival.animate(
+      [
+        { filter: "drop-shadow(0 0 7px #ffffff60)" },
+        {
+          filter:
+            "drop-shadow(0 0 13px #ffffffe0) drop-shadow(0 0 26px #fff7e660)",
+          offset: 0.4,
+        },
+        { filter: "drop-shadow(0 0 7px #ffffff60)" },
+      ],
+      { duration: reduced ? 300 : 650, easing: "ease-in-out" },
+    ).finished;
     session.completeBirth();
     sync();
   }
@@ -350,13 +414,13 @@ export async function showScreenThree(previous, selected) {
       fairies.map((f, i) => {
         f.resting = false;
         const point = orbit(-Math.PI / 2, i);
-        return move(f, point.x, point.y, 2400);
+        return move(f, point.x, point.y, 1700);
       }),
     );
     session.startFinale();
     sync();
     for (let round = 0; round < 3; round++) {
-      await animate(12500, (t) => {
+      await animate([7500, 6000, 4800][round], (t) => {
         finalEnergy = round + t;
         const angle = -Math.PI / 2 + t * Math.PI * 2;
         fairies.forEach((f, i) => {
@@ -365,11 +429,20 @@ export async function showScreenThree(previous, selected) {
           f.y = point.y;
           position(f);
         });
-        if (round === 2) {
-          stones.forEach((s, i) => {
-            s.awakened = true;
-            stoneElements[i].classList.add("awakened");
+        if (round === 0)
+          stones.forEach((stone, i) => {
+            let phase =
+              (Math.atan2((stone.y - 470) / 158, (stone.x - 720) / 505) +
+                Math.PI / 2) /
+              (Math.PI * 2);
+            phase = (phase + 1) % 1;
+            if (!stone.flower && t >= phase && !stone.awakened) {
+              session.awakenNormal(i, stone);
+              stoneElements[i].setAttribute("aria-label", "Awakened empty stone");
+              stoneElements[i].classList.add("awakened", "empty-awakened");
+            }
           });
+        if (round === 2) {
           effects.veil = Math.max(0, (t - 0.3) / 0.7);
         }
       });
@@ -378,16 +451,38 @@ export async function showScreenThree(previous, selected) {
     }
     effects.veil = 1;
     sync();
-    // Future artwork can listen here; the current sequence remains behind the living veil.
-    scene.dispatchEvent(
-      new CustomEvent("screen-three:veil-ready", {
-        detail: { flowers: session.owners.map((o) => o.flower) },
+    scene.classList.add("world-awakened");
+    await Promise.all(
+      fairies.map((f, i) => {
+        const stone = stones[session.owners[i].stone];
+        return move(f, stone.x + stone.w * 0.38 - 69, stone.y - 249, 900);
       }),
     );
+    await animate(2300, (t) => {
+      effects.veil = 1 - ease(t);
+    });
+    session.revealWorld();
+    sync();
+    fairies.forEach((f) => {
+      f.resting = false;
+      f.el.classList.remove("resting");
+      f.el.tabIndex = 0;
+      f.target = { x: f.x, y: f.y };
+    });
   }
+
   function paint() {
-    for (const f of fairies) position(f);
-    const p = centre(active);
+    for (const f of fairies) {
+      position(f);
+      const c = centre(f);
+      f.light.style.setProperty("--light-x", `${c.x}px`);
+      f.light.style.setProperty("--light-y", `${c.y}px`);
+      f.aura.style.cssText = `left:${c.x - 150}px;top:${c.y - 70}px;--aura:${f.colour};`;
+    }
+    const p = handoffLight || centre(active);
+    const exploring = session.phase === "exploring";
+    const radius = exploring ? 230 : session.phase === "finale" ? 220 : 95;
+    world.style.setProperty("--torch-radius", `${radius}px`);
     world.style.setProperty("--torch-x", `${p.x}px`);
     world.style.setProperty("--torch-y", `${p.y}px`);
     stones.forEach((stone, i) => {
@@ -397,7 +492,7 @@ export async function showScreenThree(previous, selected) {
       const ambient = stone.awakened ? 0.85 : target ? 0.65 : 0.008;
       stoneElements[i].style.setProperty(
         "--stone-light",
-        String(Math.max(ambient, (1 - d / 230) * 0.7)),
+        String(Math.max(ambient, (1 - d / radius) * 0.95)),
       );
       stoneElements[i].disabled =
         session.phase !== "exploring" ||
@@ -406,7 +501,11 @@ export async function showScreenThree(previous, selected) {
         (stone.flower && !target);
       const energy = stone.awakened
         ? 0.6
-        : Math.max(stone.charge * 0.5, (stone.rockLight || 0) * 0.75);
+        : Math.max(
+            stone.charge * 0.5,
+            (stone.rockLight || 0) * 0.75,
+            !stone.flower && exploring ? Math.max(0, 1 - d / 100) * 0.5 : 0,
+          );
       if (!stone.charge)
         stone.halo.style.setProperty("--flower-colour", "#efe9d9");
       stone.spill.style.opacity = String(
@@ -438,6 +537,19 @@ export async function showScreenThree(previous, selected) {
   function frame(time) {
     const dt = Math.min(64, time - (lastTime || time));
     lastTime = time;
+    if (session.phase === "awakened") {
+      const follow = reduced ? 1 : 1 - Math.exp(-dt / 48);
+      fairies.forEach((f) => {
+        f.x += (f.target.x - f.x) * follow;
+        f.y += (f.target.y - f.y) * follow;
+      });
+      if (emission > 400) {
+        emission = 0;
+        const f = fairies[Math.floor(Math.random() * 3)],
+          p = centre(f);
+        effects.emit(p.x, p.y, f.colour, 1, 0.15);
+      }
+    }
     if (session.phase === "exploring") {
       const follow = reduced ? 1 : 1 - Math.exp(-dt / 48);
       active.x += (active.target.x - active.x) * follow;
@@ -446,7 +558,8 @@ export async function showScreenThree(previous, selected) {
         index = stones.findIndex(
           (s) =>
             !s.awakened &&
-            (!s.flower || session.isTarget(s)) &&
+            s.flower &&
+            session.isTarget(s) &&
             Math.hypot(s.x - p.x, s.y - p.y) < 48,
         );
       if (index >= 0) {

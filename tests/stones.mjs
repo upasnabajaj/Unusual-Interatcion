@@ -29,13 +29,17 @@ console.log(
 );
 
 for (let trial = 0; trial < 40; trial++) {
-  const selectedOrder = [["Lotus", "Rose", "Lily"], ["Rose", "Lily", "Lotus"], ["Lily", "Lotus", "Rose"]][trial % 3];
+  const selectedOrder = [
+    ["Lotus", "Rose", "Lily"],
+    ["Rose", "Lily", "Lotus"],
+    ["Lily", "Lotus", "Rose"],
+  ][trial % 3];
   const session = new AwakeningSession(selectedOrder);
   const mapping = session.stones.map((s) => s.flower);
   assert.equal(session.startFinale(), false);
   for (const [i, s] of session.stones.entries())
     if (!s.flower) {
-      assert.equal(session.awakenNormal(i, s), true);
+      assert.equal(session.awakenNormal(i, s), false);
       assert.equal(session.awakenNormal(i, s), false);
     }
   const order = session.selectionOrder.map((name) =>
@@ -58,15 +62,21 @@ for (let trial = 0; trial < 40; trial++) {
     assert.equal(session.completeFlower(), false);
     assert.equal(session.completeTransformation(), true);
     assert.equal(session.completeTransformation(), false);
+    assert.equal(session.stones.filter((s) => session.isTarget(s)).length, 0);
     assert.equal(session.owners[n].flower, s.flower);
     assert.equal(session.owners[n].fairy, n);
     assert.equal(session.completeBirth(), n < 2);
   }
   assert.equal(session.startFinale(), true);
+  for (const [i, s] of session.stones.entries())
+    if (!s.flower) assert.equal(session.awakenNormal(i, s), true);
   for (let n = 0; n < 3; n++) assert.equal(session.completeRound(), true);
   assert.equal(session.completeRound(), false);
   assert.equal(session.completeBirth(), false);
   assert.equal(session.phase, "veiled");
+  assert.equal(session.revealWorld(), true);
+  assert.equal(session.phase, "awakened");
+  assert.equal(session.revealWorld(), false);
   assert.deepEqual(
     session.stones.map((s) => s.flower),
     mapping,
@@ -74,5 +84,5 @@ for (let trial = 0; trial < 40; trial++) {
   assert.ok(session.stones.every((s) => s.awakened));
 }
 console.log(
-  "PASS: stable assignment, selection-order ownership, activation locks, three fairies, exactly three rounds and terminal veil",
+  "PASS: stable assignment, selection-order ownership, activation locks, three fairies, exactly three rounds, permanent finale stones and interactive awakened state",
 );

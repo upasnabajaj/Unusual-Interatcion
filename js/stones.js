@@ -62,7 +62,7 @@ export class AwakeningSession {
   awakenNormal(index, light) {
     const stone = this.stones[index];
     if (
-      this.phase !== "exploring" ||
+      this.phase !== "finale" ||
       !stone ||
       stone.flower ||
       stone.awakened ||
@@ -115,6 +115,11 @@ export class AwakeningSession {
   startFinale() {
     if (this.phase !== "gathering" || this.owners.length !== 3) return false;
     this.phase = "finale";
+    return true;
+  }
+  revealWorld() {
+    if (this.phase !== "veiled") return false;
+    this.phase = "awakened";
     return true;
   }
   completeRound() {

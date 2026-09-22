@@ -88,13 +88,15 @@
   color: #fff9e9;
 }
 .flower-option[aria-pressed="true"] img {
-  filter: brightness(1.27) drop-shadow(0 0 6px #fff2cd80);
+  filter: brightness(1.5) drop-shadow(0 0 5px #fff9e6c0)
+    drop-shadow(0 0 14px #fff2d56b);
 }
 .flower-option[aria-pressed="true"] .flower-circle {
-  background: radial-gradient(ellipse, #fff3cd12, transparent 70%);
+  background: radial-gradient(ellipse, #fff6df36, transparent 74%);
   box-shadow:
-    0 0 20px #fff1ca32,
-    inset 0 0 18px #fff1ca16;
+    0 0 9px #fff9e68c,
+    0 0 34px #fff1da80,
+    inset 0 0 22px #fff4df33;
 }
 .flower-option[aria-disabled="true"] {
   cursor: default;
