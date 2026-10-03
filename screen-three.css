@@ -169,10 +169,10 @@
   opacity: 0.8;
 }
 .engraving-energy {
-  background: conic-gradient(
-    from -90deg,
-    var(--flower-colour) calc(var(--charge) * 1turn),
-    transparent 0
+  background: radial-gradient(ellipse farthest-corner at center,
+    var(--flower-colour) 0%,
+    var(--flower-colour) calc(var(--charge) * 100%),
+    transparent calc(var(--charge) * 100% + 4%)
   );
   mask-image: var(--engraving);
   mask-size: 100% 100%;
