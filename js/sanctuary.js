@@ -1,3 +1,4 @@
+import { createRoomMaterials } from './room-materials.js?v=rich-sanctuary-5';
 /** Final-state appearance only. No selection, position or choreography changes. */
 const NS = 'http://www.w3.org/2000/svg';
 const svg = (className, content) => {
@@ -20,6 +21,7 @@ export function mountSanctuary(world, stones, background) {
   world.querySelector('.torch-room').after(architecture);
   // Re-light the existing foliage pixels; the original architecture stays intact.
   const foliage=architecture.cloneNode();foliage.className='exploration-background sanctuary-foliage';architecture.after(foliage);
+  const materials = createRoomMaterials(world, background);
   const atmosphere=svg('sanctuary-atmosphere',`<defs><radialGradient id="sanctuary-haze"><stop stop-color="#a9b2d0" stop-opacity=".16"/><stop offset="1" stop-color="#a9b2d0" stop-opacity="0"/></radialGradient><linearGradient id="sanctuary-ray" x2=".5" y2="1"><stop stop-color="#d8ddee" stop-opacity=".1"/><stop offset="1" stop-color="#becbdc" stop-opacity="0"/></linearGradient></defs><ellipse cx="733" cy="300" rx="370" ry="180" fill="url(#sanctuary-haze)"/><path d="M343 -20 L412 -20 L777 550 L565 550Z" fill="url(#sanctuary-ray)"/><ellipse class="sanctuary-mist" cx="640" cy="415" rx="260" ry="38" fill="url(#sanctuary-haze)"/>`);
   world.querySelector('.stone-lights').before(atmosphere);
   const floor=svg('sanctuary-floor',stones.map((s,i)=>ripples(s.x,s.y+s.h*.58,s.w*.62,s.colour,i+10)).join(''));
@@ -35,6 +37,9 @@ export function mountSanctuary(world, stones, background) {
   world.querySelector('.exploration-stones').after(detail);
   const motes=svg('sanctuary-motes',Array.from({length:23},(_,i)=>`<circle class="sanctuary-mote" cx="${150+seed(i+19)*1140}" cy="${150+seed(i+65)*590}" r="${i%5===0?1.2:.65}" fill="${i%3?'#d2d4df':'#e9dcc0'}" style="--mote-delay:-${i*.7}s;--mote-duration:${7+i%6}s"/>`).join(''));
   world.querySelector('.exploration-fairies').before(motes);
+  const lamps = [[232,315],[1194,347],[681,215],[805,299],[166,445],[1300,476],[327,597],[1124,617],[555,687],[912,692],[475,485],[993,489]];
+  const warm = svg('sanctuary-warmth', `<defs><radialGradient id="warm-point"><stop stop-color="#ffe3a3" stop-opacity=".55"/><stop offset=".2" stop-color="#e8aa56" stop-opacity=".2"/><stop offset="1" stop-color="#ce8c46" stop-opacity="0"/></radialGradient></defs>` + lamps.map(([x,y],i)=>`<circle cx="${x}" cy="${y}" r="${i<4?30:17}" fill="url(#warm-point)"/><circle class="sanctuary-ember" cx="${x}" cy="${y}" r="1.2" fill="#ffe2a2" style="animation-delay:-${i*.8}s"/>${ripples(x,y+16,i<4?23:34,'#e5b36c',i+80)}`).join(''));
+  world.querySelector('.exploration-stones').before(warm);
   const reflections=[];
   return {
     addFairy(f) {
@@ -46,6 +51,7 @@ export function mountSanctuary(world, stones, background) {
       world.querySelector('.exploration-stones').before(reflection);reflections[f.id]=reflection.querySelector('g');
     },
     update(f) {
+      if(world.classList.contains("world-awakened")) materials.update(f);
       const reflection=reflections[f.id];if(!reflection)return;
       reflection.setAttribute('transform',`translate(${f.x+86} ${Math.max(440,Math.min(710,f.y+253))})`);
       reflection.style.setProperty('--reflection-colour',f.colour);

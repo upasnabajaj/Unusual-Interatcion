@@ -376,3 +376,22 @@
 .world-awakened .final-coloured-light {opacity:.18;}
 .world-awakened .stone-ground-light {mix-blend-mode:screen;opacity:.075;}
 .sanctuary-reflection {stroke-width:2;filter:blur(1.5px);}
+
+/* Material-specific final lighting uses the existing room texture pixel for pixel. */
+.sanctuary-materials,.sanctuary-surface-light,.sanctuary-warmth {
+ position:absolute;inset:0;width:1440px;height:811px;pointer-events:none;opacity:0;transition:opacity 2s ease;
+}
+.world-awakened .sanctuary-materials,.world-awakened .sanctuary-warmth {opacity:1;}
+.world-awakened .sanctuary-surface-light {opacity:.65;mix-blend-mode:screen;}
+.world-awakened .sanctuary-moonlight,.world-awakened .sanctuary-foliage,.world-awakened .final-fairy-light,.world-awakened .stone-spill {opacity:0;}
+.world-awakened .fairy-pearl .fairy-wing {opacity:.42;}
+.world-awakened .explorer-scale {opacity:.91;}
+.world-awakened .explorer-scale .fairy-art {filter:saturate(.92) drop-shadow(0 0 3px var(--fairy-colour));}
+.world-awakened .fairy-pearl .fairy-art {filter:sepia(.09) brightness(1.02);}
+.world-awakened .fairy-pose {filter:drop-shadow(0 0 2px #fff7e899) drop-shadow(0 0 9px color-mix(in srgb,var(--fairy-colour) 45%,transparent));}
+.world-awakened .awakened-botany {opacity:.82;}
+.world-awakened .awakened-botany svg {filter:saturate(1.25) drop-shadow(0 0 2px #e3b36f33);}
+.world-awakened .empty-awakened::after {border-color:#f5d7a6b0;box-shadow:0 0 7px #ebbd7955,inset 0 0 4px #f4dfba44;}
+.sanctuary-ember {animation:ember-breathe 5s ease-in-out infinite alternate;}
+@keyframes ember-breathe {from{opacity:.45}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.sanctuary-ember{animation:none}}
