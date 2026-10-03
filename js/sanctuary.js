@@ -1,4 +1,4 @@
-import { createRoomMaterials } from './room-materials.js?v=jewel-fairies-12';
+import { createRoomMaterials } from './room-materials.js?v=centred-patterns-13';
 /** Final-state appearance only. No selection, position or choreography changes. */
 const NS = 'http://www.w3.org/2000/svg';
 const svg = (className, content) => {
@@ -60,7 +60,11 @@ export function mountSanctuary(world, stones, background) {
   const stoneLights = stones.flatMap((s,i) => {
     if(!s.flower)return [];
     const el=world.querySelectorAll('.exploration-stone')[i], mark=el.querySelector('.stone-mark');
-    const finalPattern=document.createElement('img');finalPattern.className='final-pattern';finalPattern.src=`assets/screen-three/patterns/${s.flower.toLowerCase()}.png`;finalPattern.alt='';finalPattern.draggable=false;mark.append(finalPattern);finalPatterns.push(finalPattern);mark.dataset.flower=s.flower.toLowerCase();
+    const finalPattern=document.createElement('img');finalPattern.className='final-pattern';finalPattern.src=`assets/screen-three/patterns/${s.flower.toLowerCase()}.png`;finalPattern.alt='';finalPattern.draggable=false;// Centre the visible luminous artwork, accounting for unequal transparent PNG margins.
+    const centres={Lotus:[274,298.6],Rose:[255.7,291.3],Jasmine:[236.3,296.9],Daisy:[276.8,215.4],Tulip:[254.6,219.3],Lily:[235.5,217.3]};
+    const [cx,cy]=centres[s.flower];
+    finalPattern.style.translate=`${(256-cx)/512*100}% ${(256-cy)/512*100}%`;
+    mark.append(finalPattern);finalPatterns.push(finalPattern);mark.dataset.flower=s.flower.toLowerCase();
     mark.style.setProperty('--engraving' ,el.querySelector('.engraving-energy').style.getPropertyValue('--engraving'));
     for(const name of ['engraving-bloom','engraving-core']) {
       const layer=document.createElement('span');layer.className=name;layer.setAttribute('aria-hidden','true');mark.append(layer);

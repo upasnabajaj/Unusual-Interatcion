@@ -56,7 +56,7 @@ fairy.figure.addEventListener("keydown", (event) => {
 scene.addEventListener(
   "fairy:twirl-complete",
   async () => {
-    const { showScreenTwo } = await import("./screen-two.js?v=jewel-fairies-12");
+    const { showScreenTwo } = await import("./screen-two.js?v=centred-patterns-13");
     await showScreenTwo(scene);
   },
   { once: true },
