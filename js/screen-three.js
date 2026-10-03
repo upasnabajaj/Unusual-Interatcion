@@ -1,7 +1,8 @@
 import {
   AwakeningSession,
   flowerColours,
-} from "./stones.js?v=bright-world-3";
+} from "./stones.js?v=sanctuary-4";
+import { mountSanctuary } from "./sanctuary.js?v=sanctuary-4";
 import { MagicEffects } from "./magic-effects.js";
 
 const BG = "assets/screen-three/six-stone-environment.png";
@@ -18,9 +19,9 @@ export async function showScreenThree(previous, selected) {
   scene.innerHTML = `<svg class="tint-definitions" aria-hidden="true"><defs>
     <filter id="awakened-daylight" color-interpolation-filters="sRGB">
       <feComponentTransfer>
-        <feFuncR type="gamma" amplitude="1.15" exponent="0.42" offset="0.035"/>
-        <feFuncG type="gamma" amplitude="1.15" exponent="0.42" offset="0.035"/>
-        <feFuncB type="gamma" amplitude="1.15" exponent="0.42" offset="0.035"/>
+        <feFuncR type="gamma" amplitude="1.02" exponent="0.53" offset="0"/>
+        <feFuncG type="gamma" amplitude="1.08" exponent="0.53" offset="0"/>
+        <feFuncB type="gamma" amplitude="1.2" exponent="0.53" offset="0"/>
       </feComponentTransfer>
     </filter>
   </defs></svg><div class="exploration-world">
@@ -42,6 +43,7 @@ export async function showScreenThree(previous, selected) {
     reduced,
   );
   const fairies = [];
+  let sanctuary;
   const canMove = (f) =>
     session.phase === "awakened" ||
     (session.phase === "exploring" && f === active);
@@ -130,6 +132,7 @@ export async function showScreenThree(previous, selected) {
       resting: false,
     };
     fairies.push(f);
+    if(sanctuary) sanctuary.addFairy(f);
     const light = document.createElement("img");
     light.src = BG;
     light.alt = "";
@@ -233,6 +236,8 @@ export async function showScreenThree(previous, selected) {
     stone.halo = halo;
     return el;
   });
+  sanctuary = mountSanctuary(world, stones, BG);
+  sanctuary.addFairy(active);
   function tint(f, colour, amount) {
     const rgb = colour.match(/[0-9a-f]{2}/gi).map((n) => parseInt(n, 16) / 255);
     const [r, g, b] = rgb.map((v) => 1 + (v - 1) * amount);
@@ -487,6 +492,7 @@ export async function showScreenThree(previous, selected) {
   function paint() {
     for (const f of fairies) {
       position(f);
+      sanctuary?.update(f);
       const c = centre(f);
       f.light.style.setProperty("--light-x", `${c.x}px`);
       f.light.style.setProperty("--light-y", `${c.y}px`);
@@ -553,6 +559,10 @@ export async function showScreenThree(previous, selected) {
     if (session.phase === "awakened") {
       const follow = reduced ? 1 : 1 - Math.exp(-dt / 48);
       fairies.forEach((f) => {
+        const moving = Math.hypot(f.target.x-f.x,f.target.y-f.y)>2;
+        if(moving && !reduced && time-(f.lastDust||0)>140) {
+          effects.emit(f.x+21,f.y+35,f.colour,1,.12);f.lastDust=time;
+        }
         f.x += (f.target.x - f.x) * follow;
         f.y += (f.target.y - f.y) * follow;
       });
