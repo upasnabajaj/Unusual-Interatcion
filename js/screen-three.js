@@ -1,7 +1,7 @@
 import {
   AwakeningSession,
   flowerColours,
-} from "./stones.js?v=colourful-world-2";
+} from "./stones.js?v=bright-world-3";
 import { MagicEffects } from "./magic-effects.js";
 
 const BG = "assets/screen-three/six-stone-environment.png";
@@ -15,7 +15,15 @@ export async function showScreenThree(previous, selected) {
   scene.dataset.state = "exploring";
   scene.setAttribute("aria-label", "Explore the dark ruins with the fairy");
   scene.inert = true;
-  scene.innerHTML = `<div class="exploration-world">
+  scene.innerHTML = `<svg class="tint-definitions" aria-hidden="true"><defs>
+    <filter id="awakened-daylight" color-interpolation-filters="sRGB">
+      <feComponentTransfer>
+        <feFuncR type="gamma" amplitude="1.15" exponent="0.42" offset="0.035"/>
+        <feFuncG type="gamma" amplitude="1.15" exponent="0.42" offset="0.035"/>
+        <feFuncB type="gamma" amplitude="1.15" exponent="0.42" offset="0.035"/>
+      </feComponentTransfer>
+    </filter>
+  </defs></svg><div class="exploration-world">
     <img class="exploration-background dormant-room" src="${BG}" alt="" draggable="false">
     <img class="exploration-background torch-room" src="${BG}" alt="" draggable="false">
     <div class="awakened-colour" aria-hidden="true"></div><div class="awakened-radiance" aria-hidden="true"></div>

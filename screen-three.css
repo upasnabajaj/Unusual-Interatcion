@@ -235,7 +235,8 @@
   transition: filter 2s ease;
 }
 .world-awakened .dormant-room {
-  filter: brightness(2.65) saturate(1.6);
+  /* Lift deep shadows rather than just brightening already-lit areas. */
+  filter: url(#awakened-daylight) saturate(1.45);
 }
 .world-awakened .torch-room {
   opacity: 0;
@@ -351,10 +352,16 @@
     radial-gradient(ellipse at 51% 70%, var(--world-colour-2), transparent 40%),
     radial-gradient(ellipse at 83% 56%, var(--world-colour-3), transparent 43%);
 }
-.world-awakened .awakened-colour { opacity: .78; }
+.world-awakened .awakened-colour { opacity: .48; }
 .world-awakened .awakened-radiance { opacity: .14; }
 .world-awakened .awakened-botany svg { filter: saturate(1.65) brightness(1.25); }
 .world-awakened .stone-ground-light { filter: blur(12px) saturate(1.6); }
 @media (prefers-reduced-motion: reduce) {
   .awakened-colour, .awakened-radiance { transition: none; }
+}
+
+/* Every environmental light layer shares the bright ending exposure. */
+.world-awakened .stone-spill,
+.world-awakened .final-fairy-light {
+  filter: url(#awakened-daylight) brightness(1.12) saturate(1.45);
 }
