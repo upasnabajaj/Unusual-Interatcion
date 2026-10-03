@@ -421,10 +421,10 @@
 .world-awakened .exploration-stone {translate:var(--final-dx) var(--final-dy);}
 .world-awakened .sanctuary-atmosphere {opacity:.35;}
 .world-awakened .sanctuary-surface-light {opacity:.5;}
-.world-awakened .fairy-pearl {opacity:.7;}
-.world-awakened .fairy-pearl .fairy-body {mask-image:radial-gradient(ellipse 13% 28% at 61% 46%,#000 0%,#000a 42%,transparent 100%);}
+.world-awakened .fairy-pearl {opacity:.86;}
+.world-awakened .fairy-pearl .fairy-body {mask-image:radial-gradient(ellipse 18% 38% at 61% 49%,#000 0%,#000a 42%,transparent 100%);}
 .world-awakened .fairy-pearl .fairy-wing {opacity:.24;}
 .world-awakened .fairy-pose {filter:drop-shadow(0 0 1px #fff7e888) drop-shadow(0 0 8px color-mix(in srgb,var(--fairy-colour) 65%,transparent));}
 .world-awakened .explorer-scale {opacity:.92;}
-.world-awakened .engraving-energy {filter:brightness(1.4) drop-shadow(0 0 1px #fff4de) drop-shadow(0 0 4px var(--flower-colour)) drop-shadow(0 0 9px var(--flower-colour));}
+.world-awakened .engraving-energy {filter:brightness(1.12) drop-shadow(0 0 .5px #fff4de) drop-shadow(0 0 4px var(--flower-colour)) drop-shadow(0 0 9px var(--flower-colour));}
 .world-awakened .empty-awakened::after {border-color:#fff1ce44;box-shadow:0 0 4px #fff1ce22;}
