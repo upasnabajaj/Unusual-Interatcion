@@ -1,8 +1,8 @@
 import {
   AwakeningSession,
   flowerColours,
-} from "./stones.js?v=golden-sanctuary-7";
-import { mountSanctuary } from "./sanctuary.js?v=golden-sanctuary-7";
+} from "./stones.js?v=awakened-art-8";
+import { mountSanctuary } from "./sanctuary.js?v=awakened-art-8";
 import { MagicEffects } from "./magic-effects.js";
 
 const BG = "assets/screen-three/six-stone-environment.png";
@@ -213,9 +213,12 @@ export async function showScreenThree(previous, selected) {
       "aria-label",
       stone.flower ? "Faint engraving" : "Dormant stone",
     );
+    // Presentation alignment for the supplied awakened artwork; gameplay coordinates stay unchanged.
+    const finalCentres = [[451,433],[724,412],[1020,434],[364,580],[733,624],[1134,580]];
+    const [finalX, finalY] = finalCentres[index];
     const colour = stone.flower ? flowerColours[stone.flower] : "#efe9d9";
     stone.colour = colour;
-    el.style.cssText = `left:${stone.x - stone.w / 2}px;top:${stone.y - stone.h / 2}px;width:${stone.w}px;height:${stone.h}px;--stone-angle:${stone.angle}deg;--flower-colour:${colour};--charge:0;`;
+    el.style.cssText = `left:${stone.x - stone.w / 2}px;top:${stone.y - stone.h / 2}px;width:${stone.w}px;height:${stone.h}px;--stone-angle:${stone.angle}deg;--flower-colour:${colour};--charge:0;--final-dx:${finalX-stone.x}px;--final-dy:${finalY-stone.y}px;`;
     if (stone.flower) {
       const src = `assets/screen-two/${stone.flower.toLowerCase()}.png`;
       el.innerHTML = `<span class="stone-mark"><img class="stone-engraving" src="${src}" alt="" draggable="false"><span class="engraving-energy" style="--engraving:url('${src}')"></span></span>`;

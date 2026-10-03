@@ -1,4 +1,4 @@
-import { createRoomMaterials } from './room-materials.js?v=golden-sanctuary-7';
+import { createRoomMaterials } from './room-materials.js?v=awakened-art-8';
 /** Final-state appearance only. No selection, position or choreography changes. */
 const NS = 'http://www.w3.org/2000/svg';
 const svg = (className, content) => {
