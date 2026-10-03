@@ -467,3 +467,13 @@
 .world-awakened .stone-mark {filter:drop-shadow(0 1px .7px #20142699) drop-shadow(0 0 2px var(--flower-colour));}
 .world-awakened:not(.patterns-materializing) .sanctuary-floor {opacity:0;}
 .world-awakened .empty-awakened::after {display:none;}
+
+/* Final live-layer polish; no environment pixels or gameplay coordinates change. */
+.fairy-pose {scale:1;transition:scale 1.2s ease;}
+.world-awakened .fairy-pose {scale:.88;transform-origin:86px 139px;filter:drop-shadow(0 0 1px #fff8df88) drop-shadow(0 0 4px color-mix(in srgb,var(--fairy-colour) 70%,transparent)) drop-shadow(0 0 10px color-mix(in srgb,var(--fairy-colour) 16%,transparent));}
+.world-awakened .fairy-pearl .fairy-body {mask-image:radial-gradient(ellipse 6% 11% at 61% 38%,#000 0%,#000a 38%,transparent 100%);}
+.world-awakened .fairy-pearl .fairy-wing {opacity:.3;filter:contrast(2) brightness(1.12);}
+.world-awakened .explorer-scale .fairy-art {filter:contrast(1.22) saturate(1.5) drop-shadow(0 0 1.5px var(--fairy-colour));}
+.world-awakened .stone-mark {filter:drop-shadow(0 1px .7px #20142699) drop-shadow(0 0 2px var(--flower-colour)) drop-shadow(0 0 4px color-mix(in srgb,var(--flower-colour) 55%,transparent));}
+.world-awakened .stone-mark[data-flower="rose"] {filter:brightness(1.22) drop-shadow(0 1px .7px #201426bb) drop-shadow(0 0 2px var(--flower-colour)) drop-shadow(0 0 5px color-mix(in srgb,var(--flower-colour) 65%,transparent));}
+@media(prefers-reduced-motion:reduce){.fairy-pose{transition:none}}

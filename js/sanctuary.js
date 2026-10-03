@@ -1,4 +1,4 @@
-import { createRoomMaterials } from './room-materials.js?v=final-assets-11';
+import { createRoomMaterials } from './room-materials.js?v=jewel-fairies-12';
 /** Final-state appearance only. No selection, position or choreography changes. */
 const NS = 'http://www.w3.org/2000/svg';
 const svg = (className, content) => {
@@ -60,7 +60,7 @@ export function mountSanctuary(world, stones, background) {
   const stoneLights = stones.flatMap((s,i) => {
     if(!s.flower)return [];
     const el=world.querySelectorAll('.exploration-stone')[i], mark=el.querySelector('.stone-mark');
-    const finalPattern=document.createElement('img');finalPattern.className='final-pattern';finalPattern.src=`assets/screen-three/patterns/${s.flower.toLowerCase()}.png`;finalPattern.alt='';finalPattern.draggable=false;mark.append(finalPattern);finalPatterns.push(finalPattern);
+    const finalPattern=document.createElement('img');finalPattern.className='final-pattern';finalPattern.src=`assets/screen-three/patterns/${s.flower.toLowerCase()}.png`;finalPattern.alt='';finalPattern.draggable=false;mark.append(finalPattern);finalPatterns.push(finalPattern);mark.dataset.flower=s.flower.toLowerCase();
     mark.style.setProperty('--engraving' ,el.querySelector('.engraving-energy').style.getPropertyValue('--engraving'));
     for(const name of ['engraving-bloom','engraving-core']) {
       const layer=document.createElement('span');layer.className=name;layer.setAttribute('aria-hidden','true');mark.append(layer);

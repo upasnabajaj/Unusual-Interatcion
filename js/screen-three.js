@@ -1,8 +1,8 @@
 import {
   AwakeningSession,
   flowerColours,
-} from "./stones.js?v=final-assets-11";
-import { mountSanctuary } from "./sanctuary.js?v=final-assets-11";
+} from "./stones.js?v=jewel-fairies-12";
+import { mountSanctuary } from "./sanctuary.js?v=jewel-fairies-12";
 import { MagicEffects } from "./magic-effects.js";
 
 const BG = "assets/screen-three/six-stone-environment.png";
@@ -479,10 +479,14 @@ export async function showScreenThree(previous, selected) {
         return move(f, stone.x + stone.w * 0.38 - 69, stone.y - 249, 900);
       }),
     );
-    await animate(2300, (t) => {
-      effects.veil = 1 - ease(t);
-    });
-    await sanctuary.revealPatterns(reduced);
+    // Overlap the carving reveal with the thinning sparkle veil, avoiding a second visual cut.
+    await Promise.all([
+      animate(3400, (t) => { effects.veil = 1 - ease(t); }),
+      (async () => {
+        await animate(1300, () => {});
+        await sanctuary.revealPatterns(reduced);
+      })(),
+    ]);
     session.revealWorld();
     sync();
     fairies.forEach((f) => {
