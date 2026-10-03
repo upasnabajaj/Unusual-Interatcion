@@ -1,7 +1,7 @@
 import {
   AwakeningSession,
   flowerColours,
-} from "./stones.js?v=awakened-world-1";
+} from "./stones.js?v=colourful-world-2";
 import { MagicEffects } from "./magic-effects.js";
 
 const BG = "assets/screen-three/six-stone-environment.png";
@@ -18,6 +18,7 @@ export async function showScreenThree(previous, selected) {
   scene.innerHTML = `<div class="exploration-world">
     <img class="exploration-background dormant-room" src="${BG}" alt="" draggable="false">
     <img class="exploration-background torch-room" src="${BG}" alt="" draggable="false">
+    <div class="awakened-colour" aria-hidden="true"></div><div class="awakened-radiance" aria-hidden="true"></div>
     <div class="awakened-botany" aria-hidden="true"></div><div class="final-fairy-lights"></div>
     <div class="stone-lights"></div><div class="exploration-stones"></div><div class="exploration-fairies"></div>
     <div class="birth-orb" aria-hidden="true"></div>
@@ -454,6 +455,7 @@ export async function showScreenThree(previous, selected) {
     }
     effects.veil = 1;
     sync();
+    fairies.forEach((fairy, i) => scene.style.setProperty(`--world-colour-${i + 1}`, fairy.colour));
     scene.classList.add("world-awakened");
     await Promise.all(
       fairies.map((f, i) => {

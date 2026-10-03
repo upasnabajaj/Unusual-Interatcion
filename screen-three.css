@@ -235,7 +235,7 @@
   transition: filter 2s ease;
 }
 .world-awakened .dormant-room {
-  filter: brightness(1.65) saturate(0.8);
+  filter: brightness(2.65) saturate(1.6);
 }
 .world-awakened .torch-room {
   opacity: 0;
@@ -263,7 +263,7 @@
   opacity: 1;
 }
 .world-awakened .final-coloured-light {
-  opacity: 0.13;
+  opacity: 0.27;
 }
 .empty-awakened::after {
   content: "";
@@ -321,9 +321,40 @@
     brightness(calc(1 + var(--final-energy, 0) * 0.15));
 }
 .world-awakened .awakened-botany {
-  opacity: 0.45;
+  opacity: 0.95;
 }
 .awakened-botany svg {
   width: 68px;
   height: 47px;
+}
+
+/* Colour returns to the architecture and floor only after the final dance. */
+.awakened-colour, .awakened-radiance {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 2.2s ease;
+}
+.awakened-colour {
+  mix-blend-mode: color;
+  background:
+    radial-gradient(ellipse at 9% 34%, #58b59a 0%, transparent 42%),
+    radial-gradient(ellipse at 86% 27%, #8a78d7 0%, transparent 42%),
+    radial-gradient(ellipse at 50% 8%, #748bcd 0%, transparent 50%),
+    linear-gradient(115deg, var(--world-colour-1), var(--world-colour-2) 50%, var(--world-colour-3));
+}
+.awakened-radiance {
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(ellipse at 22% 55%, var(--world-colour-1), transparent 43%),
+    radial-gradient(ellipse at 51% 70%, var(--world-colour-2), transparent 40%),
+    radial-gradient(ellipse at 83% 56%, var(--world-colour-3), transparent 43%);
+}
+.world-awakened .awakened-colour { opacity: .78; }
+.world-awakened .awakened-radiance { opacity: .14; }
+.world-awakened .awakened-botany svg { filter: saturate(1.65) brightness(1.25); }
+.world-awakened .stone-ground-light { filter: blur(12px) saturate(1.6); }
+@media (prefers-reduced-motion: reduce) {
+  .awakened-colour, .awakened-radiance { transition: none; }
 }
