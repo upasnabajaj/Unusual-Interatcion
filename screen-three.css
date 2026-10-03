@@ -459,3 +459,11 @@
 .world-awakened .sanctuary-floor {filter:drop-shadow(0 0 3px #ffffff22);}
 .world-awakened .sanctuary-floor .sanctuary-reflection {stroke-width:2;filter:blur(1.6px);}
 .world-awakened .engraving-core {opacity:.42;}
+
+/* Approved final symbol sheet: original coloured artwork, transparent individual assets. */
+.final-pattern {display:none;position:absolute;inset:-8% -5%;width:110%;height:116%;object-fit:fill;pointer-events:none;opacity:0;}
+.world-awakened .stone-mark > :not(.final-pattern) {display:none;}
+.world-awakened .final-pattern {display:block;}
+.world-awakened .stone-mark {filter:drop-shadow(0 1px .7px #20142699) drop-shadow(0 0 2px var(--flower-colour));}
+.world-awakened:not(.patterns-materializing) .sanctuary-floor {opacity:0;}
+.world-awakened .empty-awakened::after {display:none;}

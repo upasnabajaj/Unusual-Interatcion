@@ -1,8 +1,8 @@
 import {
   AwakeningSession,
   flowerColours,
-} from "./stones.js?v=cinematic-night-10";
-import { mountSanctuary } from "./sanctuary.js?v=cinematic-night-10";
+} from "./stones.js?v=final-assets-11";
+import { mountSanctuary } from "./sanctuary.js?v=final-assets-11";
 import { MagicEffects } from "./magic-effects.js";
 
 const BG = "assets/screen-three/six-stone-environment.png";
@@ -214,7 +214,7 @@ export async function showScreenThree(previous, selected) {
       stone.flower ? "Faint engraving" : "Dormant stone",
     );
     // Presentation alignment for the supplied awakened artwork; gameplay coordinates stay unchanged.
-    const finalCentres = [[451,433],[724,412],[1020,434],[364,580],[733,624],[1134,580]];
+    const finalCentres = [[462,414],[734,400],[1020,415],[360,551],[727,590],[1121,551]];
     const [finalX, finalY] = finalCentres[index];
     const colour = stone.flower ? flowerColours[stone.flower] : "#efe9d9";
     stone.colour = colour;
@@ -482,6 +482,7 @@ export async function showScreenThree(previous, selected) {
     await animate(2300, (t) => {
       effects.veil = 1 - ease(t);
     });
+    await sanctuary.revealPatterns(reduced);
     session.revealWorld();
     sync();
     fairies.forEach((f) => {
