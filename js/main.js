@@ -56,7 +56,7 @@ fairy.figure.addEventListener("keydown", (event) => {
 scene.addEventListener(
   "fairy:twirl-complete",
   async () => {
-    const { showScreenTwo } = await import("./screen-two.js?v=rich-sanctuary-5");
+    const { showScreenTwo } = await import("./screen-two.js?v=golden-sanctuary-6");
     await showScreenTwo(scene);
   },
   { once: true },

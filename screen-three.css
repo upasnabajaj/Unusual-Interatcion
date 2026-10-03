@@ -395,3 +395,15 @@
 .sanctuary-ember {animation:ember-breathe 5s ease-in-out infinite alternate;}
 @keyframes ember-breathe {from{opacity:.45}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){.sanctuary-ember{animation:none}}
+
+/* Reference-led golden garden finish, revealed only after the finale. */
+.sanctuary-garden {position:absolute;inset:0;width:1440px;height:811px;pointer-events:none;opacity:0;transition:opacity 2s ease;filter:drop-shadow(0 0 3px #f2bf6a55);}
+.world-awakened .sanctuary-garden {opacity:1;}
+.world-awakened .sanctuary-floor {filter:drop-shadow(0 0 4px #e4c39455);}
+.world-awakened .sanctuary-surface-light {opacity:.9;}
+.world-awakened .final-coloured-light {opacity:.26;}
+.world-awakened .engraving-energy {filter:saturate(1.12) brightness(1.25) drop-shadow(0 0 3px var(--flower-colour)) drop-shadow(0 0 8px var(--flower-colour));}
+.world-awakened .fairy-pose {filter:drop-shadow(0 0 2px #fff7e8aa) drop-shadow(0 0 12px color-mix(in srgb,var(--fairy-colour) 60%,transparent));}
+.world-awakened .fairy-pearl .fairy-wing {opacity:.32;}
+.world-awakened .explorer-scale .fairy-art {filter:saturate(1.12) drop-shadow(0 0 3px var(--fairy-colour));}
+.world-awakened .stone-ground-light {opacity:.12;}
