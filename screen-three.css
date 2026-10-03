@@ -448,3 +448,14 @@
 .world-awakened .engraving-surface-light {opacity:.42;}
 .world-awakened .sanctuary-fairy-reflection {filter:blur(.6px);}
 @media(prefers-reduced-motion:reduce){.fairy-dust i{animation:none;opacity:.25}}
+
+/* Cinematic hierarchy: selected live magic anchors the spatially lit room. */
+.world-awakened .empty-awakened::after {opacity:.18;box-shadow:none;}
+.world-awakened .empty-awakened {box-shadow:none;background:none;}
+.world-awakened .fairy-pearl .fairy-body {mask-image:radial-gradient(ellipse 8% 15% at 61% 38%,#000 0%,#000a 38%,transparent 100%);}
+.world-awakened .fairy-pearl .fairy-wing {opacity:.29;filter:contrast(1.8) brightness(1.1);}
+.world-awakened .explorer-scale .fairy-art {filter:contrast(1.18) saturate(1.42) drop-shadow(0 0 2px var(--fairy-colour));}
+.world-awakened .engraving-surface-light {opacity:.78;}
+.world-awakened .sanctuary-floor {filter:drop-shadow(0 0 3px #ffffff22);}
+.world-awakened .sanctuary-floor .sanctuary-reflection {stroke-width:2;filter:blur(1.6px);}
+.world-awakened .engraving-core {opacity:.42;}

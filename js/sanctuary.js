@@ -1,4 +1,4 @@
-import { createRoomMaterials } from './room-materials.js?v=live-magic-9';
+import { createRoomMaterials } from './room-materials.js?v=cinematic-night-10';
 /** Final-state appearance only. No selection, position or choreography changes. */
 const NS = 'http://www.w3.org/2000/svg';
 const svg = (className, content) => {
@@ -24,7 +24,7 @@ export function mountSanctuary(world, stones, background) {
   const materials = createRoomMaterials(world, background);
   const atmosphere=svg('sanctuary-atmosphere',`<defs><radialGradient id="sanctuary-haze"><stop stop-color="#a9b2d0" stop-opacity=".16"/><stop offset="1" stop-color="#a9b2d0" stop-opacity="0"/></radialGradient><linearGradient id="sanctuary-ray" x2=".5" y2="1"><stop stop-color="#d8ddee" stop-opacity=".1"/><stop offset="1" stop-color="#becbdc" stop-opacity="0"/></linearGradient></defs><ellipse cx="733" cy="300" rx="370" ry="180" fill="url(#sanctuary-haze)"/><path d="M343 -20 L412 -20 L777 550 L565 550Z" fill="url(#sanctuary-ray)"/><ellipse class="sanctuary-mist" cx="640" cy="415" rx="260" ry="38" fill="url(#sanctuary-haze)"/>`);
   world.querySelector('.stone-lights').before(atmosphere);
-  const floor=svg('sanctuary-floor',stones.map((s,i)=>ripples(s.x,s.y+s.h*.58,s.w*.62,s.colour,i+10)).join(''));
+  const floor=svg('sanctuary-floor',stones.map((s,i)=>s.flower?ripples(s.x,s.y+s.h*.58,s.w*.62,s.colour,i+10):'').join(''));
   world.querySelector('.exploration-stones').before(floor);
   const detail=svg('sanctuary-stone-detail',stones.map((s,i)=>{
     const moss=Array.from({length:13},(_,j)=>{
