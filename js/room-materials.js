@@ -24,7 +24,7 @@ export function createRoomMaterials(world, background) {
     update(f) {
       let light=lights.get(f.id);
       if(!light) {
-        const el=document.createElement('canvas');el.width=1440;el.height=811;el.className='sanctuary-surface-light';el.setAttribute('aria-hidden','true');
+        const el=document.createElement('canvas');el.width=1440;el.height=811;el.className='sanctuary-surface-light'+(f.stone?' engraving-surface-light':'');el.setAttribute('aria-hidden','true');
         canvas.after(el);
         const source=document.createElement('canvas');source.width=1440;source.height=811;
         light={el,source,colour:f.colour};lights.set(f.id,light);prepare(light);
@@ -34,7 +34,7 @@ export function createRoomMaterials(world, background) {
       light.x=f.x;light.y=f.y;
       const c=light.el.getContext('2d');c.clearRect(0,0,1440,811);c.globalCompositeOperation='source-over';c.drawImage(light.source,0,0);
       c.globalCompositeOperation='destination-in';
-      const g=c.createRadialGradient(f.x+86,f.y+139,10,f.x+86,f.y+139,215);
+      const g=c.createRadialGradient(f.x+86,f.y+139,10,f.x+86,f.y+139,f.stone?105:175);
       g.addColorStop(0,'#ffff');g.addColorStop(.3,'#fffa');g.addColorStop(1,'#fff0');c.fillStyle=g;c.fillRect(0,0,1440,811);
     }
   };

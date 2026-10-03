@@ -1,4 +1,4 @@
-import { createRoomMaterials } from './room-materials.js?v=awakened-art-8';
+import { createRoomMaterials } from './room-materials.js?v=live-magic-9';
 /** Final-state appearance only. No selection, position or choreography changes. */
 const NS = 'http://www.w3.org/2000/svg';
 const svg = (className, content) => {
@@ -55,17 +55,29 @@ export function mountSanctuary(world, stones, background) {
   }).join('')+[[235,170,300],[680,65,255],[1210,130,335],[325,25,240],[1120,20,220]].map(([x,y,h],i)=>Array.from({length:24},(_,j)=>`<circle class="sanctuary-ember" cx="${x+Math.sin(j*.55+i)*10}" cy="${y+j*h/24}" r="${.5+seed(j+i*24)}" fill="#ffd797" opacity="${.35+seed(j+32)*.6}" style="animation-delay:-${j*.4}s"/>`).join('')).join(''));
   world.querySelector('.exploration-stones').after(garden);
   const reflections=[];
+  const stoneLights = stones.flatMap((s,i) => {
+    if(!s.flower)return [];
+    const el=world.querySelectorAll('.exploration-stone')[i], mark=el.querySelector('.stone-mark');
+    mark.style.setProperty('--engraving',el.querySelector('.engraving-energy').style.getPropertyValue('--engraving'));
+    for(const name of ['engraving-bloom','engraving-core']) {
+      const layer=document.createElement('span');layer.className=name;layer.setAttribute('aria-hidden','true');mark.append(layer);
+    }
+    const dx=parseFloat(el.style.getPropertyValue('--final-dx'))||0,dy=parseFloat(el.style.getPropertyValue('--final-dy'))||0;
+    return [{id:'stone-'+i,x:s.x+dx-86,y:s.y+dy-139,colour:s.colour,stone:true}];
+  });
   return {
     addFairy(f) {
       const pose=f.el.querySelector('.fairy-pose');
       const pearl=document.createElement('div');pearl.className='fairy-pearl';pearl.setAttribute('aria-hidden','true');
       pearl.innerHTML='<div class="fairy-art"><img class="fairy-layer fairy-body" src="assets/fairy.png" alt="" draggable="false"><img class="fairy-layer fairy-wing" src="assets/fairy.png" alt="" draggable="false"></div>';
       pose.append(pearl);
+      const dust=document.createElement('div');dust.className='fairy-dust';dust.setAttribute('aria-hidden','true');
+      dust.innerHTML=Array.from({length:7},(_,i)=>`<i style="left:${18+seed(i+9)*95}px;top:${22+seed(i+17)*175}px;--delay:-${i*.7}s"></i>`).join('');pose.append(dust);
       const reflection=svg('sanctuary-fairy-reflection',ripples(0,0,72,'#ffffff',f.id+40));
       world.querySelector('.exploration-stones').before(reflection);reflections[f.id]=reflection.querySelector('g');
     },
     update(f) {
-      if(world.classList.contains("world-awakened")) materials.update(f);
+      if(world.classList.contains("world-awakened")) { materials.update(f); stoneLights.forEach(light=>materials.update(light)); }
       const reflection=reflections[f.id];if(!reflection)return;
       reflection.setAttribute('transform',`translate(${f.x+86} ${Math.max(440,Math.min(710,f.y+253))})`);
       reflection.style.setProperty('--reflection-colour',f.colour);

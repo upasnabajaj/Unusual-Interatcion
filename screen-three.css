@@ -428,3 +428,23 @@
 .world-awakened .explorer-scale {opacity:.92;}
 .world-awakened .engraving-energy {filter:brightness(1.12) drop-shadow(0 0 .5px #fff4de) drop-shadow(0 0 4px var(--flower-colour)) drop-shadow(0 0 9px var(--flower-colour));}
 .world-awakened .empty-awakened::after {border-color:#fff1ce44;box-shadow:0 0 4px #fff1ce22;}
+
+/* Live integration only: the approved environment artwork is untouched. */
+.world-awakened .fairy-pearl {opacity:1;}
+.world-awakened .fairy-pearl .fairy-body {mask-image:radial-gradient(ellipse 11% 21% at 61% 39%,#000 12%,#000c 47%,transparent 100%);filter:brightness(1.16);}
+.world-awakened .fairy-pearl .fairy-wing {opacity:.52;filter:contrast(1.65) brightness(1.15);mix-blend-mode:screen;}
+.world-awakened .explorer-scale .fairy-art {filter:contrast(1.12) saturate(1.25) drop-shadow(0 0 2px var(--fairy-colour));}
+.world-awakened .fairy-pose {filter:drop-shadow(0 0 1px #fff9e966) drop-shadow(0 0 5px color-mix(in srgb,var(--fairy-colour) 65%,transparent)) drop-shadow(0 0 14px color-mix(in srgb,var(--fairy-colour) 18%,transparent));}
+.fairy-dust {display:none;position:absolute;inset:0;pointer-events:none;}
+.world-awakened .fairy-dust {display:block;}
+.fairy-dust i {position:absolute;width:1.5px;height:1.5px;border-radius:50%;background:#fff7e5;box-shadow:0 0 3px 1px var(--fairy-colour);animation:fairy-glint 4s ease-in-out infinite;animation-delay:var(--delay);}
+@keyframes fairy-glint {0%,100%{opacity:0;transform:translateY(3px)}45%{opacity:.8}80%{opacity:0;transform:translateY(-6px)}}
+.engraving-core,.engraving-bloom {display:none;position:absolute;inset:0;pointer-events:none;mask-image:var(--engraving);mask-size:100% 100%;clip-path:ellipse(42% 42% at 50% 50%);}
+.world-awakened .engraving-core {display:block;background:#fff5e0;opacity:.55;filter:contrast(1.3);mix-blend-mode:screen;}
+.world-awakened .engraving-bloom {display:block;background:var(--flower-colour);filter:blur(2px);opacity:.8;transform:scale(1.018);}
+.world-awakened .stone-mark {filter:drop-shadow(0 1px .6px #251c29aa) drop-shadow(0 0 3px var(--flower-colour)) drop-shadow(0 0 7px color-mix(in srgb,var(--flower-colour) 65%,transparent));}
+.world-awakened .engraving-energy {filter:brightness(1.3) saturate(1.25);opacity:1;}
+.world-awakened .sanctuary-surface-light {opacity:.68;}
+.world-awakened .engraving-surface-light {opacity:.42;}
+.world-awakened .sanctuary-fairy-reflection {filter:blur(.6px);}
+@media(prefers-reduced-motion:reduce){.fairy-dust i{animation:none;opacity:.25}}
