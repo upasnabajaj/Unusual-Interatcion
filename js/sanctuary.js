@@ -1,4 +1,4 @@
-import { createRoomMaterials } from './room-materials.js?v=golden-sanctuary-6';
+import { createRoomMaterials } from './room-materials.js?v=golden-sanctuary-7';
 /** Final-state appearance only. No selection, position or choreography changes. */
 const NS = 'http://www.w3.org/2000/svg';
 const svg = (className, content) => {
@@ -13,7 +13,7 @@ function ripples(x,y,w,colour,key) {
   return `<g class="sanctuary-reflection" style="--reflection-colour:${colour};--shimmer-delay:-${key%7}s" transform="translate(${x} ${y})">${Array.from({length:25},(_,j)=>{
     const extent=(.2+seed(j+key)*.8)*w*(1-j/35);
     const dx=(seed(j*3+key)-.5)*w*.6;
-    return `<path d="M${dx-extent/2} ${j*5} q${extent*.4} ${seed(j+9)*2} ${extent} 0" opacity="${(.68*(1-j/26)).toFixed(3)}"/>`;
+    return `<path d="M${dx-extent/2} ${j*5} q${extent*.4} ${seed(j+9)*2} ${extent} 0" opacity="${(.32*(1-j/26)).toFixed(3)}"/>`;
   }).join('')}</g>`;
 }
 export function mountSanctuary(world, stones, background) {
@@ -38,7 +38,7 @@ export function mountSanctuary(world, stones, background) {
   const motes=svg('sanctuary-motes',Array.from({length:23},(_,i)=>`<circle class="sanctuary-mote" cx="${150+seed(i+19)*1140}" cy="${150+seed(i+65)*590}" r="${i%5===0?1.2:.65}" fill="${i%3?'#d2d4df':'#e9dcc0'}" style="--mote-delay:-${i*.7}s;--mote-duration:${7+i%6}s"/>`).join(''));
   world.querySelector('.exploration-fairies').before(motes);
   const lamps = [[232,315],[1194,347],[681,215],[805,299],[166,445],[1300,476],[327,597],[1124,617],[555,687],[912,692],[475,485],[993,489]];
-  const warm = svg('sanctuary-warmth', `<defs><radialGradient id="warm-point"><stop stop-color="#ffe3a3" stop-opacity=".55"/><stop offset=".2" stop-color="#e8aa56" stop-opacity=".2"/><stop offset="1" stop-color="#ce8c46" stop-opacity="0"/></radialGradient></defs>` + lamps.map(([x,y],i)=>`<circle cx="${x}" cy="${y}" r="${i<4?48:28}" fill="url(#warm-point)"/><circle class="sanctuary-ember" cx="${x}" cy="${y}" r="1.2" fill="#ffe2a2" style="animation-delay:-${i*.8}s"/>${ripples(x,y+16,i<4?23:34,'#e5b36c',i+80)}`).join(''));
+  const warm = svg('sanctuary-warmth', `<defs><radialGradient id="warm-point"><stop stop-color="#ffe3a3" stop-opacity=".55"/><stop offset=".2" stop-color="#e8aa56" stop-opacity=".2"/><stop offset="1" stop-color="#ce8c46" stop-opacity="0"/></radialGradient></defs>` + lamps.map(([x,y],i)=>`<circle cx="${x}" cy="${y}" r="${i<4?48:28}" fill="url(#warm-point)"/><circle class="sanctuary-ember" cx="${x}" cy="${y}" r="1.2" fill="#ffe2a2" style="animation-delay:-${i*.8}s"/>${y>420?ripples(x,y+16,34,'#e5b36c',i+80):''}`).join(''));
   world.querySelector('.exploration-stones').before(warm);
   // Golden light follows planting and the worn lower edges, never the carvings.
   const garden = svg('sanctuary-garden', `<defs><filter id="garden-bloom"><feGaussianBlur stdDeviation="2"/></filter></defs>` + stones.map((s,i)=> {

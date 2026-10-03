@@ -1,8 +1,8 @@
 import {
   AwakeningSession,
   flowerColours,
-} from "./stones.js?v=golden-sanctuary-6";
-import { mountSanctuary } from "./sanctuary.js?v=golden-sanctuary-6";
+} from "./stones.js?v=golden-sanctuary-7";
+import { mountSanctuary } from "./sanctuary.js?v=golden-sanctuary-7";
 import { MagicEffects } from "./magic-effects.js";
 
 const BG = "assets/screen-three/six-stone-environment.png";

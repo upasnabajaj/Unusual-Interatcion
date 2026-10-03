@@ -407,3 +407,8 @@
 .world-awakened .fairy-pearl .fairy-wing {opacity:.32;}
 .world-awakened .explorer-scale .fairy-art {filter:saturate(1.12) drop-shadow(0 0 3px var(--fairy-colour));}
 .world-awakened .stone-ground-light {opacity:.12;}
+
+/* Legacy torch spill is grayscale; final material lighting replaces it entirely. */
+.world-awakened .stone-spill {display:none;}
+.world-awakened .stone-ground-light {opacity:.14 !important;}
+.world-awakened .sanctuary-reflection {stroke-width:1.5;filter:blur(2px);}
