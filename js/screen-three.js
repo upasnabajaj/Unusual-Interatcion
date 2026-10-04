@@ -1,3 +1,4 @@
+import { music } from "./audio/music.js";
 import {
   AwakeningSession,
   flowerColours,
@@ -9,6 +10,7 @@ const BG = "assets/screen-three/six-stone-environment.png";
 const centre = (f) => ({ x: f.x + 86, y: f.y + 139 });
 const ease = (p) => p * p * (3 - 2 * p);
 export async function showScreenThree(previous, selected) {
+  music.setStage("exploring", selected);
   const session = new AwakeningSession([...selected]),
     stones = session.stones;
   const scene = document.createElement("main");
@@ -239,6 +241,25 @@ export async function showScreenThree(previous, selected) {
     stone.halo = halo;
     return el;
   });
+  // Audio-only spatial input. Never captures pointers or changes existing movement.
+  let soundTap=null;
+  scene.addEventListener('pointerdown',event=>{
+    if(session.phase==='awakened' && event.isPrimary && event.button===0)
+      soundTap={id:event.pointerId,x:event.clientX,y:event.clientY,time:performance.now()};
+  },true);
+  scene.addEventListener('pointercancel',()=>{soundTap=null;},true);
+  scene.addEventListener('pointerup',event=>{
+    const tap=soundTap;soundTap=null;
+    if(!tap || tap.id!==event.pointerId || session.phase!=='awakened' || performance.now()-tap.time>700 || Math.hypot(tap.x-event.clientX,tap.y-event.clientY)>14)return;
+    const box=world.getBoundingClientRect(),x=(event.clientX-box.left)/scale,y=(event.clientY-box.top)/scale;
+    const pan=Math.max(-.65,Math.min(.65,(x/1440-.5)*1.3));
+    const fairy=fairies.find(f=>{const b=f.el.getBoundingClientRect();return event.clientX>=b.left && event.clientX<=b.right && event.clientY>=b.top && event.clientY<=b.bottom;});
+    if(fairy){music.interact('fairy',session.owners.find(o=>o.fairy===fairy.id)?.flower,pan);return;}
+    const index=stoneElements.findIndex(el=>{const b=el.getBoundingClientRect();return event.clientX>=b.left && event.clientX<=b.right && event.clientY>=b.top && event.clientY<=b.bottom;});
+    if(index>=0){music.interact(stones[index].flower?'stone':'ruins',stones[index].flower,pan);return;}
+    const family=(x>120&&x<260&&y<455)||y>650?'water':x<240||x>1200?'plants':y<350?'ruins':y<470?'light':'water';
+    music.interact(family,null,pan);
+  },true);
   sanctuary = mountSanctuary(world, stones, BG);
   sanctuary.addFairy(active);
   function tint(f, colour, amount) {
@@ -293,6 +314,7 @@ export async function showScreenThree(previous, selected) {
       stoneElements[index].style.setProperty("--charge", String(t));
       stone.halo.style.setProperty("--flower-colour", stone.colour);
     });
+    music.motif(stone.flower);
     session.completeFlower();
     sync();
     const heart = centre(f);
@@ -303,6 +325,7 @@ export async function showScreenThree(previous, selected) {
     });
     orb.style.opacity = "0";
     const pose = f.el.querySelector(".fairy-pose");
+    music.twirl(stone.flower);
     const spin = pose.animate(
       reduced
         ? [{ opacity: 1 }, { opacity: 0.7 }, { opacity: 1 }]
@@ -424,6 +447,7 @@ export async function showScreenThree(previous, selected) {
     };
   }
   async function finale() {
+    music.gathering();
     effects.colours = fairies.map((f) => f.colour);
     const p = centre(active);
     effects.burst(p.x, p.y, effects.colours);
@@ -438,6 +462,7 @@ export async function showScreenThree(previous, selected) {
     sync();
     for (let round = 0; round < 3; round++) {
       await animate([7500, 6000, 4800][round], (t) => {
+        music.progress(round,t);
         finalEnergy = round + t;
         const angle = -Math.PI / 2 + t * Math.PI * 2;
         fairies.forEach((f, i) => {
@@ -472,6 +497,7 @@ export async function showScreenThree(previous, selected) {
     effects.veil = 1;
     sync();
     fairies.forEach((fairy, i) => scene.style.setProperty(`--world-colour-${i + 1}`, fairy.colour));
+    music.awaken();
     scene.classList.add("world-awakened");
     await Promise.all(
       fairies.map((f, i) => {
@@ -487,6 +513,7 @@ export async function showScreenThree(previous, selected) {
         await sanctuary.revealPatterns(reduced);
       })(),
     ]);
+    music.setStage("awakened");
     session.revealWorld();
     sync();
     fairies.forEach((f) => {
@@ -568,6 +595,7 @@ export async function showScreenThree(previous, selected) {
       const follow = reduced ? 1 : 1 - Math.exp(-dt / 48);
       fairies.forEach((f) => {
         const moving = Math.hypot(f.target.x-f.x,f.target.y-f.y)>2;
+        if(moving) music.motion(session.owners.find(owner=>owner.fairy===f.id)?.flower);
         if(moving && !reduced && time-(f.lastDust||0)>140) {
           effects.emit(f.x+21,f.y+35,f.colour,1,.12);f.lastDust=time;
         }

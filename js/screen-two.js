@@ -1,3 +1,4 @@
+import { music } from "./audio/music.js";
 import { Fairy } from "./fairy.js";
 import { FlowerSelection } from "./selection.js";
 
@@ -55,6 +56,7 @@ class SelectionFairy extends Fairy {
 }
 
 export async function showScreenTwo(previous) {
+  music.setStage("selection");
   const scene = document.createElement("main");
   scene.id = "screen-two";
   scene.dataset.state = "idle";
@@ -85,7 +87,7 @@ export async function showScreenTwo(previous) {
     if (!selection.ready || leaving) return;
     leaving = true;
     scene.inert = true;
-    const { showScreenThree } = await import("./screen-three.js?v=centred-patterns-13");
+    const { showScreenThree } = await import("./screen-three.js?v=composed-audio-14");
     await showScreenThree(scene, [...selection.selected]);
   });
   for (const flower of flowers) {
@@ -99,7 +101,10 @@ export async function showScreenTwo(previous) {
     button.innerHTML = `<span class="flower-circle" aria-hidden="true"></span><img src="assets/screen-two/${flower.name.toLowerCase()}.png" alt="" draggable="false"><span class="flower-name" style="left:${flower.labelX - flower.x}px;top:${flower.labelY - flower.y}px">${flower.name}</span>`;
     button.addEventListener("click", () => {
       if (fairy.twirlAnimation) return;
+      const wasSelected = selection.selected.has(flower.name);
       selection.toggle(flower.name);
+      const isSelected = selection.selected.has(flower.name);
+      if(wasSelected !== isSelected) music.select(flower.name, selection.selected, isSelected);
       for (const option of options.children) {
         const selected = selection.selected.has(option.dataset.flower);
         option.setAttribute("aria-pressed", String(selected));

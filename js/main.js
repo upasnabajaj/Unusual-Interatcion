@@ -1,3 +1,4 @@
+import { music } from "./audio/music.js";
 import { Fairy } from "./fairy.js";
 
 const scene = document.querySelector("#screen-one");
@@ -56,7 +57,8 @@ fairy.figure.addEventListener("keydown", (event) => {
 scene.addEventListener(
   "fairy:twirl-complete",
   async () => {
-    const { showScreenTwo } = await import("./screen-two.js?v=centred-patterns-13");
+    music.twirl();
+    const { showScreenTwo } = await import("./screen-two.js?v=composed-audio-14");
     await showScreenTwo(scene);
   },
   { once: true },
