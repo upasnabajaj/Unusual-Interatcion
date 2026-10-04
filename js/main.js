@@ -57,7 +57,7 @@ fairy.figure.addEventListener("keydown", (event) => {
 scene.addEventListener(
   "fairy:twirl-start",
   async () => {
-    const { showScreenTwo } = await import("./screen-two.js?v=responsive-taps-15");
+    const { showScreenTwo } = await import("./screen-two.js?v=enchanted-waltz-16");
     await showScreenTwo(scene);
   },
   { once: true },

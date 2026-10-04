@@ -311,6 +311,7 @@ export async function showScreenThree(previous, selected) {
       stone.rockLight = t;
     });
     await animate(1700, (t) => {
+      music.activation(stone.flower,t);
       stone.charge = t;
       stoneElements[index].style.setProperty("--charge", String(t));
       stone.halo.style.setProperty("--flower-colour", stone.colour);
@@ -410,6 +411,7 @@ export async function showScreenThree(previous, selected) {
       orb.style.transform = `translate(-50%,-50%) scale(${0.5 + t * 0.8})`;
       if (!reduced) effects.emit(x, y, "#eee6ff", 1, 0.25);
     });
+    music.bloom(session.selectionOrder[session.activeFairy + 1]);
     const next = createFairy(tx - 86, ty - 139, true);
     await animate(1200, (t) => {
       next.el.style.opacity = String(t);
@@ -603,6 +605,10 @@ export async function showScreenThree(previous, selected) {
         f.x += (f.target.x - f.x) * follow;
         f.y += (f.target.y - f.y) * follow;
       });
+      music.placement(fairies.map(f=>{const p=centre(f),name=session.owners.find(o=>o.fairy===f.id)?.flower;
+        const near=stones.some(s=>s.flower&&Math.hypot(s.x-p.x,s.y-p.y)<130);
+        const area=near?'stone':(p.x>120&&p.x<260)||p.y>650?'water':p.x<240||p.x>1200?'plants':p.y<350?'ruins':'light';
+        return {name,x:p.x/1440,y:p.y/811,area};}));
       if (emission > 400) {
         emission = 0;
         const f = fairies[Math.floor(Math.random() * 3)],
@@ -622,6 +628,8 @@ export async function showScreenThree(previous, selected) {
             session.isTarget(s) &&
             Math.hypot(s.x - p.x, s.y - p.y) < 48,
         );
+      const targetStone=stones.find(s=>session.isTarget(s));
+      if(targetStone)music.approach(targetStone.flower,Math.hypot(targetStone.x-p.x,targetStone.y-p.y));
       if (index >= 0) {
         if (holdStone !== index) {
           holdStone = index;
