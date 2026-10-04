@@ -1,5 +1,5 @@
 import { music } from "./audio/music.js";
-import { Fairy } from "./fairy.js";
+import { Fairy } from "./fairy.js?v=twirl-then-next-17";
 import { FlowerSelection } from "./selection.js";
 
 const flowers = [
@@ -55,7 +55,7 @@ class SelectionFairy extends Fairy {
   resize() {}
 }
 
-export async function showScreenTwo(previous) {
+export async function showScreenTwo(previous, twirlFinished = Promise.resolve()) {
   music.setStage("selection");
   const scene = document.createElement("main");
   scene.id = "screen-two";
@@ -87,8 +87,9 @@ export async function showScreenTwo(previous) {
     if (!selection.ready || leaving) return;
     leaving = true;
     scene.inert = true;
-    const { showScreenThree } = await import("./screen-three.js?v=enchanted-waltz-16");
-    await showScreenThree(scene, [...selection.selected]);
+    const finished = new Promise(resolve => scene.addEventListener("fairy:twirl-complete", resolve, { once: true }));
+    const { showScreenThree } = await import("./screen-three.js?v=twirl-then-next-17");
+    await showScreenThree(scene, [...selection.selected], finished);
   });
   for (const flower of flowers) {
     const button = document.createElement("button");
@@ -185,10 +186,11 @@ export async function showScreenTwo(previous) {
       img.decode().catch(() => {}),
     ),
   );
+  await twirlFinished;
   previous.inert = true;
   const duration = matchMedia("(prefers-reduced-motion: reduce)").matches
     ? 120
-    : 450;
+    : 180;
   await Promise.all([
     scene.animate([{ opacity: 0 }, { opacity: 1 }], {
       duration,

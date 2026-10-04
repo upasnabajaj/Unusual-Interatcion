@@ -1,5 +1,5 @@
 import { music } from "./audio/music.js";
-import { Fairy } from "./fairy.js";
+import { Fairy } from "./fairy.js?v=twirl-then-next-17";
 
 const scene = document.querySelector("#screen-one");
 const fairy = new Fairy(scene);
@@ -53,12 +53,13 @@ fairy.figure.addEventListener("keydown", (event) => {
   }
 });
 
-// Begin the crossfade alongside the confirmation twirl for immediate feedback.
+// Prepare the next screen while she twirls; reveal it only when she finishes.
 scene.addEventListener(
   "fairy:twirl-start",
   async () => {
-    const { showScreenTwo } = await import("./screen-two.js?v=enchanted-waltz-16");
-    await showScreenTwo(scene);
+    const finished = new Promise(resolve => scene.addEventListener("fairy:twirl-complete", resolve, { once: true }));
+    const { showScreenTwo } = await import("./screen-two.js?v=twirl-then-next-17");
+    await showScreenTwo(scene, finished);
   },
   { once: true },
 );

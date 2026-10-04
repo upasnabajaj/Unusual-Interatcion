@@ -69,7 +69,7 @@ export class Fairy {
           },
         ];
     this.twirlAnimation = this.figure.animate(frames, {
-      duration: this.motion.matches ? 120 : 450,
+      duration: this.motion.matches ? 260 : 1350,
       easing: "cubic-bezier(.35,0,.25,1)",
     });
     this.scene.dispatchEvent(new CustomEvent("fairy:twirl-start"));
@@ -80,7 +80,7 @@ export class Fairy {
     }
     this.twirlAnimation = null;
     this.scene.dataset.state = "idle";
-    // Completion remains available independently of the overlapping transition.
+    // The next screen is prepared during the twirl and revealed on completion.
     this.scene.dispatchEvent(new CustomEvent("fairy:twirl-complete"));
   }
 

@@ -9,7 +9,7 @@ import { MagicEffects } from "./magic-effects.js";
 const BG = "assets/screen-three/six-stone-environment.png";
 const centre = (f) => ({ x: f.x + 86, y: f.y + 139 });
 const ease = (p) => p * p * (3 - 2 * p);
-export async function showScreenThree(previous, selected) {
+export async function showScreenThree(previous, selected, twirlFinished = Promise.resolve()) {
   music.setStage("exploring", selected);
   const session = new AwakeningSession([...selected]),
     stones = session.stones;
@@ -662,10 +662,11 @@ export async function showScreenThree(previous, selected) {
     requestAnimationFrame(frame);
   }
   await Promise.all(
-    [...scene.querySelectorAll("img")].map((img) => img.decode()),
+    [...scene.querySelectorAll("img")].map((img) => img.decode().catch(() => {})),
   );
+  await twirlFinished;
   previous.inert = true;
-  const duration = reduced ? 120 : 450;
+  const duration = reduced ? 120 : 180;
   await Promise.all([
     scene.animate([{ opacity: 0 }, { opacity: 1 }], {
       duration,
