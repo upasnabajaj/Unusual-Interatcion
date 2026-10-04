@@ -1,7 +1,7 @@
 import { FLOWERS, composition, waltzBar, harmonize, CHORDS } from './score.js';
 import { voice } from './instruments.js';
 class FairyMusic {
-  constructor(){this.musicOn=true;this.positions=new Map();this.bar=0;this.nextBar=0;this.pulse=.30;this.unity=0;this.selected=[];this.stage='opening';this.queue=[];this.voices=[];this.round=-1;this.lastHit=-10;this.variations=new Map();this.discovered=new Set();this.events=[];this.stats={notes:0,peakVoices:0,rounds:[],areas:[]};}
+  constructor(){this.musicOn=true;this.positions=new Map();this.flowerBuses=new Map();this.bar=0;this.nextBar=0;this.pulse=.30;this.unity=0;this.selected=[];this.stage='opening';this.queue=[];this.voices=[];this.round=-1;this.lastHit=-10;this.variations=new Map();this.discovered=new Set();this.events=[];this.stats={notes:0,peakVoices:0,rounds:[],areas:[]};}
   install(){
     if(this.installed||typeof document==='undefined')return;this.installed=true;
     this.installToggle();
@@ -43,7 +43,7 @@ class FairyMusic {
     if(now+.12>=this.nextBar){
       const richness=this.stage==='awakened'?2:this.discovered.size/2;
       const names=[...this.discovered];
-      waltzBar(this.bar,names,richness).forEach(e=>this.play({...this.arrange(e),channel:'background',gain:e.gain*(this.stage==='rounds'?.4:1)},Math.max(0,this.nextBar-now)+e.beat*this.pulse));
+      waltzBar(this.bar,names,richness).forEach(e=>{const arranged=this.arrange(e);this.play({...arranged,channel:'background',gain:arranged.gain*(this.stage==='rounds'?.4:1)},Math.max(0,this.nextBar-now)+e.beat*this.pulse);});
       this.bar++;this.nextBar+=6*this.pulse;
       if(this.nextBar<now)this.nextBar=now+6*this.pulse;
     }
@@ -51,7 +51,7 @@ class FairyMusic {
     ready.forEach(e=>{
       if(e.at<now-.3)return;
       while(this.voices.length>=20)this.voices.shift().stop();
-      let v;v=voice(c,e.channel==='background'?this.background:this.interactions,e,Math.max(now+.005,e.at),()=>{this.voices=this.voices.filter(x=>x!==v);});this.voices.push(v);
+      let v;v=voice(c,e.channel==='background'?this.flowerDestination(e.flower):this.interactions,e,Math.max(now+.005,e.at),()=>{this.voices=this.voices.filter(x=>x!==v);});this.voices.push(v);
       this.stats.notes++;this.stats.peakVoices=Math.max(this.stats.peakVoices,this.voices.length);
     });
   }
@@ -80,6 +80,11 @@ class FairyMusic {
     this.heardRoom=true;this.stats.areas.push(family);if(this.stats.areas.length>30)this.stats.areas.shift();
   }
 
+  flowerDestination(name){
+    if(!name)return this.background;
+    if(!this.flowerBuses.has(name)){const input=this.ctx.createGain(),filter=this.ctx.createBiquadFilter(),pan=this.ctx.createStereoPanner();filter.type='lowpass';filter.frequency.value=5000;input.connect(filter).connect(pan).connect(this.background);this.flowerBuses.set(name,{input,filter,pan});this.nodes.push(input,filter,pan);}
+    return this.flowerBuses.get(name).input;
+  }
   nearPulse(){if(!this.ctx)return 0;return Math.min(.065,(this.pulse-this.ctx.currentTime%this.pulse)%this.pulse);}
   installToggle(){
     const button=document.createElement('button');button.id='music-toggle';button.type='button';
@@ -96,6 +101,7 @@ class FairyMusic {
     points.forEach(p=>{const old=this.positions.get(p.name)||p;this.positions.set(p.name,{...p,x:old.x+(p.x-old.x)*.06,y:old.y+(p.y-old.y)*.06});});
     let sum=0,n=0;for(let i=0;i<points.length;i++)for(let j=i+1;j<points.length;j++){sum+=Math.hypot(points[i].x-points[j].x,points[i].y-points[j].y);n++;}
     const target=n?Math.max(0,1-sum/n/.48):0;this.unity+=(target-this.unity)*.04;
+    if(this.ctx)for(const [name,p] of this.positions){const bus=this.flowerBuses.get(name);if(bus){bus.pan.pan.setTargetAtTime((p.x-.5)*(1.4-this.unity*.5),this.ctx.currentTime,.25);bus.filter.frequency.setTargetAtTime(6500-p.y*3700,this.ctx.currentTime,.35);}}
   }
   arrange(e){
     const p=this.positions.get(e.flower);if(!p||this.stage!=='awakened')return e;
@@ -103,7 +109,7 @@ class FairyMusic {
     const colour={water:'glass',plants:'harp',ruins:'piano',light:'celesta'};
     const close=[...this.positions.values()].some(q=>q.name!==p.name&&Math.hypot(p.x-q.x,p.y-q.y)<.22);
     if(close)this.play({channel:'background',note:harmonize(e.note-12,this.bar),instrument:'strings',gain:.024+this.unity*.02,pan:0},e.beat*this.pulse);
-    return {...e,note:e.note+octave,instrument:colour[p.area]||e.instrument,pan:(p.x-.5)*(1.4-this.unity*.5),brightness:1.3-p.y*.6,gain:e.gain*(p.area==='stone'?1.25:1)*(1+this.unity*.25)};
+    return {...e,note:e.note+octave,instrument:colour[p.area]||e.instrument,pan:0,brightness:1.3-p.y*.6,gain:e.gain*(p.area==='stone'?1.25:1)*(1+this.unity*.25)};
   }
   dispose(){if(this.disposed)return;this.disposed=true;clearInterval(this.timer);this.queue=[];this.voices.forEach(v=>{v.stop();v.cleanup();});this.voices=[];this.nodes?.forEach(n=>n.disconnect());this.ctx?.close().catch(()=>{});}
 }
