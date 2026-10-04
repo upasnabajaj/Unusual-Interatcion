@@ -53,11 +53,11 @@ fairy.figure.addEventListener("keydown", (event) => {
   }
 });
 
-// Screen 1 changes only after its existing confirmation twirl has completed.
+// Begin the crossfade alongside the confirmation twirl for immediate feedback.
 scene.addEventListener(
-  "fairy:twirl-complete",
+  "fairy:twirl-start",
   async () => {
-    const { showScreenTwo } = await import("./screen-two.js?v=composed-audio-14");
+    const { showScreenTwo } = await import("./screen-two.js?v=responsive-taps-15");
     await showScreenTwo(scene);
   },
   { once: true },

@@ -656,7 +656,7 @@ export async function showScreenThree(previous, selected) {
     [...scene.querySelectorAll("img")].map((img) => img.decode()),
   );
   previous.inert = true;
-  const duration = reduced ? 120 : 1100;
+  const duration = reduced ? 120 : 450;
   await Promise.all([
     scene.animate([{ opacity: 0 }, { opacity: 1 }], {
       duration,

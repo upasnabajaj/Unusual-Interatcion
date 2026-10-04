@@ -69,9 +69,10 @@ export class Fairy {
           },
         ];
     this.twirlAnimation = this.figure.animate(frames, {
-      duration: this.motion.matches ? 260 : 1350,
+      duration: this.motion.matches ? 120 : 450,
       easing: "cubic-bezier(.35,0,.25,1)",
     });
+    this.scene.dispatchEvent(new CustomEvent("fairy:twirl-start"));
     try {
       await this.twirlAnimation.finished;
     } catch {
@@ -79,7 +80,7 @@ export class Fairy {
     }
     this.twirlAnimation = null;
     this.scene.dataset.state = "idle";
-    // An extension point only: Screen 1 intentionally has no transition listener.
+    // Completion remains available independently of the overlapping transition.
     this.scene.dispatchEvent(new CustomEvent("fairy:twirl-complete"));
   }
 

@@ -83,11 +83,11 @@ export async function showScreenTwo(previous) {
   const fairy = new SelectionFairy(scene);
   const options = scene.querySelector(".flower-options");
   let leaving = false;
-  scene.addEventListener("fairy:twirl-complete", async () => {
+  scene.addEventListener("fairy:twirl-start", async () => {
     if (!selection.ready || leaving) return;
     leaving = true;
     scene.inert = true;
-    const { showScreenThree } = await import("./screen-three.js?v=composed-audio-14");
+    const { showScreenThree } = await import("./screen-three.js?v=responsive-taps-15");
     await showScreenThree(scene, [...selection.selected]);
   });
   for (const flower of flowers) {
@@ -188,7 +188,7 @@ export async function showScreenTwo(previous) {
   previous.inert = true;
   const duration = matchMedia("(prefers-reduced-motion: reduce)").matches
     ? 120
-    : 1000;
+    : 450;
   await Promise.all([
     scene.animate([{ opacity: 0 }, { opacity: 1 }], {
       duration,
