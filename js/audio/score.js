@@ -27,9 +27,9 @@ export function composition(selected, round=0) {
 // Original eight-bar waltz, “A door made of listening”. Each bar has six
 // eighth-note slots. The answering phrase keeps the opening's falling turn.
 export const WALTZ = [
- [[0,74],[1,78],[2,81],[4,78]], [[0,76],[2,74],[3,71],[5,69]],
- [[0,71],[1,74],[2,78],[4,76]], [[0,73],[2,76],[4,69]],
- [[0,74],[1,78],[2,83],[4,81]], [[0,78],[2,76],[3,74],[5,71]],
+ [[0,78],[1,81],[2.5,86],[4,81]], [[0,78],[2,76],[3.5,74]],
+ [[.5,74],[1.5,78],[3,81],[4.5,78]], [[0,76],[2,73],[4,69]],
+ [[0,78],[1,81],[2.5,86],[4,88]], [[0,86],[1.5,81],[3,78],[4.5,74]],
  [[0,73],[1,76],[2,81],[3,79],[4,76]], [[0,78],[2,76],[3,74]],
 ];
 export const CHORDS = [[50,57,62,66],[47,54,59,62],[43,50,55,59],[45,52,57,61],
@@ -45,10 +45,10 @@ export function waltzBar(bar, selected=[], richness=0) {
  const b=bar%8,chord=CHORDS[b],events=[];
  const add=(beat,note,instrument,gain,flower)=>events.push({beat,note,instrument,gain,flower});
  WALTZ[b].forEach(([beat,note])=>add(beat,note,'celesta',.095+richness*.012));
- add(0,chord[0],'lowStrings',.09);
- add(0,chord[2],'strings',.045+richness*.015);
- [2,4].forEach((beat,i)=>add(beat,chord[i+1]+12,'piano',.052));
- if(b%2===0||richness>0)[1,3,5].forEach((beat,i)=>add(beat,chord[i+1]+12,'harp',.036));
+ add(0,chord[0],'lowStrings',.052);
+ add(0,chord[2],'strings',.032+richness*.01);
+ if(richness>1)add(3,chord[1]+12,'piano',.027);
+ if(b%2===0||richness>0)[1.5,4.5].forEach((beat,i)=>add(beat,chord[i+1]+12,'harp',.029));
  // One flower answers each bar. Other identities leave room for that phrase.
  if(selected.length){const name=selected[Math.floor(bar/2)%selected.length],f=FLOWERS[name];
  [3,4.5,5].forEach((beat,i)=>add(beat,harmonize(f.notes[(i+b)%4],b),f.instrument,.075,name));}

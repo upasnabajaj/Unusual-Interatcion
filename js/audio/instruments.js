@@ -19,10 +19,10 @@ export function voice(ctx,destination,{note,instrument='glass',gain=.1,pan=0,bri
   amp.connect(filter).connect(stereo).connect(destination);
   const nodes=[amp,filter,stereo],oscillators=[];
   for(const [ratio,level] of colours[instrument]||colours.glass) {
-    const osc=ctx.createOscillator(),partial=ctx.createGain();osc.type=['strings','lowStrings'].includes(instrument)?'triangle':'sine';
+    const osc=ctx.createOscillator(),partial=ctx.createGain();osc.type='sine';
     osc.frequency.value=frequency(note)*ratio;partial.gain.value=level;
     // Each partial decays independently, keeping the attack detailed and the tail warm.
-    partial.gain.setValueAtTime(level,when);partial.gain.exponentialRampToValueAtTime(.0001,when+duration/(Math.max(1,ratio)**.4));
+    partial.gain.setValueAtTime(level,when);partial.gain.exponentialRampToValueAtTime(warm?level*.45:Math.max(.004,level*.07),when+duration/(Math.max(1,ratio)**.4));
     osc.connect(partial).connect(amp);nodes.push(osc,partial);oscillators.push(osc);
     osc.start(when);osc.stop(when+duration+.05);
   }

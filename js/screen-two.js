@@ -1,5 +1,5 @@
 import { music } from "./audio/music.js";
-import { Fairy } from "./fairy.js?v=twirl-then-next-17";
+import { Fairy } from "./fairy.js?v=flower-magic-18";
 import { FlowerSelection } from "./selection.js";
 
 const flowers = [
@@ -88,7 +88,7 @@ export async function showScreenTwo(previous, twirlFinished = Promise.resolve())
     leaving = true;
     scene.inert = true;
     const finished = new Promise(resolve => scene.addEventListener("fairy:twirl-complete", resolve, { once: true }));
-    const { showScreenThree } = await import("./screen-three.js?v=twirl-then-next-17");
+    const { showScreenThree } = await import("./screen-three.js?v=flower-magic-18");
     await showScreenThree(scene, [...selection.selected], finished);
   });
   for (const flower of flowers) {

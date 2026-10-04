@@ -1,7 +1,7 @@
 import { FLOWERS, waltzBar, harmonize } from './score.js';
 import { voice } from './instruments.js';
 class FairyMusic {
-  constructor(){this.musicOn=true;this.positions=new Map();this.flowerBuses=new Map();this.bar=0;this.nextBar=0;this.pulse=.30;this.unity=0;this.selected=[];this.stage='opening';this.queue=[];this.voices=[];this.round=-1;this.lastHit=-10;this.variations=new Map();this.discovered=new Set();this.events=[];this.stats={notes:0,peakVoices:0,rounds:[],areas:[]};}
+  constructor(){this.musicOn=true;this.positions=new Map();this.flowerBuses=new Map();this.bar=0;this.nextBar=0;this.pulse=.36;this.unity=0;this.selected=[];this.stage='opening';this.queue=[];this.voices=[];this.round=-1;this.lastHit=-10;this.variations=new Map();this.discovered=new Set();this.events=[];this.stats={notes:0,peakVoices:0,rounds:[],areas:[]};}
   install(){
     if(this.installed||typeof document==='undefined')return;this.installed=true;
     this.installToggle();
@@ -25,13 +25,13 @@ class FairyMusic {
       const Context=globalThis.AudioContext||globalThis.webkitAudioContext;if(!Context)return;
       const c=this.ctx=new Context();this.master=c.createGain();this.master.gain.value=0;
       const limiter=c.createDynamicsCompressor();limiter.threshold.value=-15;limiter.knee.value=15;limiter.ratio.value=8;limiter.attack.value=.004;limiter.release.value=.25;
-      this.bus=c.createGain();this.background=c.createGain();this.interactions=c.createGain();this.background.gain.value=this.musicOn?1:0;this.interactions.gain.value=1;this.background.connect(this.bus);this.interactions.connect(this.bus);this.bus.connect(limiter);limiter.connect(this.master).connect(c.destination);
+      this.bus=c.createGain();this.background=c.createGain();this.interactions=c.createGain();this.background.gain.value=this.musicOn?1:0;this.interactions.gain.value=1;this.scoreDuck=c.createGain();this.background.connect(this.scoreDuck).connect(this.bus);this.interactions.connect(this.bus);this.bus.connect(limiter);limiter.connect(this.master).connect(c.destination);
       const reverb=c.createConvolver(),buffer=c.createBuffer(2,Math.floor(c.sampleRate*1.8),c.sampleRate);
       let seed=731;for(let ch=0;ch<2;ch++){const data=buffer.getChannelData(ch);for(let i=0;i<data.length;i++){seed=(seed*1664525+1013904223)>>>0;data[i]=(seed/4294967296*2-1)*Math.exp(-i/(c.sampleRate*.38))*.28;}}
       reverb.buffer=buffer;const wet=c.createGain();wet.gain.value=.17;this.bus.connect(reverb).connect(wet).connect(limiter);
       const delay=c.createDelay(1),echo=c.createGain(),feedback=c.createGain();delay.delayTime.value=.29;echo.gain.value=.1;feedback.gain.value=.16;
       this.bus.connect(delay).connect(echo).connect(limiter);delay.connect(feedback).connect(delay);
-      this.nodes=[limiter,reverb,wet,delay,echo,feedback,this.bus,this.master,this.background,this.interactions];
+      this.nodes=[limiter,reverb,wet,delay,echo,feedback,this.bus,this.master,this.background,this.interactions,this.scoreDuck];
       this.timer=setInterval(()=>this.tick(),25);this.nextBar=c.currentTime+.08;
     }
     if(this.ctx.state==='suspended'||this.ctx.state==='interrupted')await this.ctx.resume();
@@ -50,13 +50,27 @@ class FairyMusic {
     const ready=this.queue.filter(e=>e.at<=now+.12);this.queue=this.queue.filter(e=>e.at>now+.12);
     ready.forEach(e=>{
       if(e.at<now-.3)return;
-      while(this.voices.length>=20)this.voices.shift().stop();
-      let v;v=voice(c,e.channel==='background'?this.flowerDestination(e.flower):this.interactions,e,Math.max(now+.005,e.at),()=>{this.voices=this.voices.filter(x=>x!==v);});this.voices.push(v);
+      while(this.voices.length>=20){const bg=this.voices.findIndex(v=>v.channel==='background');this.voices.splice(bg<0?0:bg,1)[0].stop();}
+      let v;v=voice(c,e.channel==='background'?this.flowerDestination(e.flower):this.interactions,e,Math.max(now+.005,e.at),()=>{this.voices=this.voices.filter(x=>x!==v);});v.channel=e.channel;this.voices.push(v);
       this.stats.notes++;this.stats.peakVoices=Math.max(this.stats.peakVoices,this.voices.length);
     });
   }
   setStage(stage,selected){this.stage=stage;if(selected)this.selected=[...selected];if(stage==='exploring')this.bloom(this.selected[0]);}
-  select(name,selected,on){this.selected=[...selected];const f=FLOWERS[name];if(!f)return;const notes=on?f.notes.slice(0,2):[f.notes[1],f.notes[0]-12];notes.forEach((note,i)=>this.play({note,instrument:f.instrument,gain:on?.11:.038,pan:(this.selected.indexOf(name)-1)*.2},this.nearPulse()+i*(on?.30:.15)));}
+  select(name,selected,on){
+    this.selected=[...selected];const f=FLOWERS[name];if(!f)return;
+    if(!this.ctx||this.ctx.state!=='running'){this.unlock().then(()=>{if(this.ctx?.state==='running')this.select(name,selected,on);}).catch(()=>{});return;}
+    // Let the chosen flower sit clearly in front of the continuing score.
+    const now=this.ctx.currentTime,duck=this.scoreDuck.gain;
+    duck.cancelAndHoldAtTime?.(now);duck.setTargetAtTime(on?.48:.8,now,.035);
+    duck.setTargetAtTime(1,now+(on?.85:.35),.3);
+    const pan=(Math.max(0,this.selected.indexOf(name))-1)*.25;
+    if(on){
+      [0,.16,.38].forEach((delay,i)=>this.play({note:f.notes[[0,1,3][i]],instrument:i===1?'harp':f.instrument,gain:[.25,.16,.20][i],pan},delay));
+      this.play({note:f.notes[0]+12,instrument:'crystal',gain:.065,pan},.07);
+      this.play({note:f.notes[3]-12,instrument:'choir',gain:.065,pan},.25);
+    }else [f.notes[1],f.notes[0]-12].forEach((note,i)=>this.play({note,instrument:'harp',gain:.085,pan},i*.16));
+  }
+
   motif(name){const f=FLOWERS[name];if(!f)return;this.discovered.add(name);[0,.32,.85,1.55].forEach((t,i)=>this.play({note:f.notes[i],instrument:f.instrument,gain:.15},t));}
   twirl(name){const f=FLOWERS[name]||FLOWERS.Lotus;[0,1,3].forEach((n,i)=>this.play({note:f.notes[n],instrument:'harp',gain:.07},i*.22));}
   gathering(){this.stage='gathering';this.selected.forEach((name,i)=>this.play({note:FLOWERS[name].notes[0],instrument:FLOWERS[name].instrument,gain:.08,pan:(i-1)*.35},i*.3));}
