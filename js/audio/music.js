@@ -1,4 +1,4 @@
-import { FLOWERS, composition, waltzBar, harmonize, CHORDS } from './score.js';
+import { FLOWERS, waltzBar, harmonize } from './score.js';
 import { voice } from './instruments.js';
 class FairyMusic {
   constructor(){this.musicOn=true;this.positions=new Map();this.flowerBuses=new Map();this.bar=0;this.nextBar=0;this.pulse=.30;this.unity=0;this.selected=[];this.stage='opening';this.queue=[];this.voices=[];this.round=-1;this.lastHit=-10;this.variations=new Map();this.discovered=new Set();this.events=[];this.stats={notes:0,peakVoices:0,rounds:[],areas:[]};}
@@ -37,11 +37,11 @@ class FairyMusic {
     if(this.ctx.state==='suspended'||this.ctx.state==='interrupted')await this.ctx.resume();
     if(!this.started){this.started=true;this.master.gain.setTargetAtTime(.5,this.ctx.currentTime,.8);}
   }
-  play(event,delay=0){if(!this.ctx||this.ctx.state!=='running')return;if(event.channel!=='background'&&!event.exact)event={...event,note:harmonize(event.note,this.bar-1)};this.queue.push({...event,at:this.ctx.currentTime+Math.max(0,delay)});if(this.queue.length>160)this.queue.splice(0,this.queue.length-160);}
+  play(event,delay=0){if(!this.ctx||this.ctx.state!=='running')return;if(event.channel!=='background'&&!event.exact)event={...event,note:harmonize(event.note,this.stage==='rounds'?this.roundBar+Math.min(3,Math.floor((this.roundProgress||0)*4)):this.bar-1)};this.queue.push({...event,at:this.ctx.currentTime+Math.max(0,delay)});if(this.queue.length>160)this.queue.splice(0,this.queue.length-160);}
   tick(){
     const c=this.ctx;if(!c||c.state!=='running')return;const now=c.currentTime;
-    if(now+.12>=this.nextBar){
-      const richness=this.stage==='awakened'?2:this.discovered.size/2;
+    if(this.stage!=='rounds'&&now+.12>=this.nextBar){
+      const richness=this.stage==='awakening'?3:this.stage==='awakened'?2:this.discovered.size/2;
       const names=[...this.discovered];
       waltzBar(this.bar,names,richness).forEach(e=>{const arranged=this.arrange(e);this.play({...arranged,channel:'background',gain:arranged.gain*(this.stage==='rounds'?.4:1)},Math.max(0,this.nextBar-now)+e.beat*this.pulse);});
       this.bar++;this.nextBar+=6*this.pulse;
@@ -61,12 +61,13 @@ class FairyMusic {
   twirl(name){const f=FLOWERS[name]||FLOWERS.Lotus;[0,1,3].forEach((n,i)=>this.play({note:f.notes[n],instrument:'harp',gain:.07},i*.22));}
   gathering(){this.stage='gathering';this.selected.forEach((name,i)=>this.play({note:FLOWERS[name].notes[0],instrument:FLOWERS[name].instrument,gain:.08,pan:(i-1)*.35},i*.3));}
   progress(round,t){
-    if(round!==this.round){this.round=round;this.stage='rounds';this.events=composition(this.selected,round).map(e=>({...e,channel:'background'}));this.cursor=0;this.sparkle=-1;this.stats.rounds.push(round+1);}
-    while(this.cursor<this.events.length&&this.events[this.cursor].beat/32<=t){const e=this.events[this.cursor++];this.play({...e,note:harmonize(e.note,this.bar-1)});}
+    this.roundProgress=t;
+    if(round!==this.round){this.round=round;this.stage='rounds';this.roundBar=this.bar;this.queue=this.queue.filter(e=>e.channel!=='background');this.events=[];for(let b=0;b<4;b++)waltzBar(this.roundBar+b,this.selected,round+1).forEach(e=>this.events.push({...e,beat:e.beat+b*6,channel:'background'}));this.events.sort((a,b)=>a.beat-b.beat);this.bar+=4;this.cursor=0;this.sparkle=-1;this.stats.rounds.push(round+1);}
+    while(this.cursor<this.events.length&&this.events[this.cursor].beat/24<=t){const e=this.events[this.cursor++];this.play(e);}
     if(round===2&&t>.45){const step=Math.floor((t-.45)*12);if(step!==this.sparkle){this.sparkle=step;const n=[81,83,86,90,93,95,98][Math.min(step,6)];this.play({note:n,instrument:'crystal',gain:.035,pan:step%2?.35:-.35});}}
     if(round===2&&t>.94&&!this.breath){this.breath=true;if(this.ctx)this.master.gain.setTargetAtTime(.19,this.ctx.currentTime,.06);}
   }
-  awaken(){this.stage='awakening';if(this.ctx)this.master.gain.setTargetAtTime(.5,this.ctx.currentTime,.6);this.play({note:50,instrument:'warm',gain:.16});this.selected.forEach((name,i)=>{const f=FLOWERS[name];this.play({note:f.notes[0],instrument:f.instrument,gain:.12,pan:(i-1)*.35},.2+i*.2);this.play({note:f.notes[3],instrument:'glass',gain:.07},1+i*.25);});}
+  awaken(){this.stage='awakening';this.nextBar=(this.ctx?.currentTime||0)+.08;if(this.ctx)this.master.gain.setTargetAtTime(.5,this.ctx.currentTime,.6);this.play({note:50,instrument:'warm',gain:.16});this.selected.forEach((name,i)=>{const f=FLOWERS[name];this.play({note:f.notes[0],instrument:f.instrument,gain:.12,pan:(i-1)*.35},.2+i*.2);this.play({note:f.notes[3],instrument:'glass',gain:.07},1+i*.25);});}
   motion(name){if(!this.ctx||this.ctx.currentTime-(this.lastMotion||0)<1.4)return;this.lastMotion=this.ctx.currentTime;const f=FLOWERS[name];if(f)this.play({note:f.notes[2]+12,instrument:'air',gain:.017});}
   interact(family,name,pan=0){
     if(!this.ctx||this.ctx.state!=='running')return;const now=this.ctx.currentTime;if(now-this.lastHit<.12)return;this.lastHit=now;

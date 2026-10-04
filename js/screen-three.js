@@ -297,6 +297,7 @@ export async function showScreenThree(previous, selected) {
     if (!stone.flower) return;
     // A nearby stone click carries her onto it; a drag-and-hold does the same.
     if (!session.beginFlower(index, p)) return;
+    music.activation(stone.flower,0);
     sync();
     hideDialogue();
     drag = null;
