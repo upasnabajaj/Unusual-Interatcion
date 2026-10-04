@@ -57,7 +57,6 @@ fairy.figure.addEventListener("keydown", (event) => {
 scene.addEventListener(
   "fairy:twirl-complete",
   async () => {
-    music.twirl();
     const { showScreenTwo } = await import("./screen-two.js?v=composed-audio-14");
     await showScreenTwo(scene);
   },

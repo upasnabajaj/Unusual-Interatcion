@@ -33,7 +33,7 @@ globalThis.TestFairy = class {
 };
 const source = (
   await readFile(new URL("../js/main.js", import.meta.url), "utf8")
-).replace(
+).replace(/import \{ music \} from [^;]+;/, "const music = { twirl() {} };").replace(
   /import \{ Fairy \} from [^;]+;/,
   "const Fairy = globalThis.TestFairy;",
 );

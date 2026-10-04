@@ -1,3 +1,4 @@
+import { music } from "./audio/music.js";
 /** Screen-independent character behavior. Artwork and dialogue share one position. */
 export class Fairy {
   constructor(scene) {
@@ -47,6 +48,7 @@ export class Fairy {
 
   async twirl() {
     if (this.twirlAnimation) return;
+    music.twirl();
     this.position = { ...this.position };
     this.scene.dataset.state = "twirling";
     const frames = this.motion.matches

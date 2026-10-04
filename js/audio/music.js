@@ -12,7 +12,8 @@ class FairyMusic {
       if(document.hidden){this.queue=[];this.voices.forEach(v=>v.stop());this.ctx.suspend().catch(()=>{});}
       else {this.nextAmbient=0;this.nextPhrase=0;this.ctx.resume().catch(()=>{});}
     });
-    addEventListener('pagehide',()=>this.dispose());
+    addEventListener('pagehide',event=>{if(event.persisted)this.ctx?.suspend().catch(()=>{});else this.dispose();});
+    addEventListener('pageshow',event=>{if(event.persisted){this.nextAmbient=0;this.nextPhrase=0;this.ctx?.resume().catch(()=>{});}});
   }
   async unlock(){
     if(this.disposed)return;
