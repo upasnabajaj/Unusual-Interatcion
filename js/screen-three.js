@@ -168,6 +168,7 @@ export async function showScreenThree(previous, selected) {
       const dx = (event.clientX - drag.x) / scale,
         dy = (event.clientY - drag.y) / scale;
       if (Math.hypot(dx, dy) > 3) hideDialogue();
+      if (session.phase === "exploring" && Math.hypot(dx, dy) > 3) music.motion(session.selectionOrder[session.activeFairy]);
       f.target.x = Math.max(0, Math.min(1301, drag.startX + dx));
       f.target.y = Math.max(0, Math.min(568, drag.startY + dy));
     });
@@ -253,10 +254,10 @@ export async function showScreenThree(previous, selected) {
     if(!tap || tap.id!==event.pointerId || session.phase!=='awakened' || performance.now()-tap.time>700 || Math.hypot(tap.x-event.clientX,tap.y-event.clientY)>14)return;
     const box=world.getBoundingClientRect(),x=(event.clientX-box.left)/scale,y=(event.clientY-box.top)/scale;
     const pan=Math.max(-.65,Math.min(.65,(x/1440-.5)*1.3));
-    const fairy=fairies.find(f=>{const b=f.el.getBoundingClientRect();return event.clientX>=b.left && event.clientX<=b.right && event.clientY>=b.top && event.clientY<=b.bottom;});
-    if(fairy){music.interact('fairy',session.owners.find(o=>o.fairy===fairy.id)?.flower,pan);return;}
     const index=stoneElements.findIndex(el=>{const b=el.getBoundingClientRect();return event.clientX>=b.left && event.clientX<=b.right && event.clientY>=b.top && event.clientY<=b.bottom;});
     if(index>=0){music.interact(stones[index].flower?'stone':'ruins',stones[index].flower,pan);return;}
+    const fairy=fairies.find(f=>{const b=f.el.getBoundingClientRect();return event.clientX>=b.left && event.clientX<=b.right && event.clientY>=b.top && event.clientY<=b.bottom;});
+    if(fairy){music.interact('fairy',session.owners.find(o=>o.fairy===fairy.id)?.flower,pan);return;}
     const family=(x>120&&x<260&&y<455)||y>650?'water':x<240||x>1200?'plants':y<350?'ruins':y<470?'light':'water';
     music.interact(family,null,pan);
   },true);

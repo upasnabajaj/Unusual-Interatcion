@@ -6,6 +6,9 @@ class FairyMusic {
     if(this.installed||typeof document==='undefined')return;this.installed=true;
     const unlock=()=>this.unlock().catch(()=>{});
     document.addEventListener('pointerdown',unlock,{capture:true,passive:true});
+    document.addEventListener('pointerup',unlock,{capture:true,passive:true});
+    document.addEventListener('touchend',unlock,{capture:true,passive:true});
+    document.addEventListener('click',unlock,{capture:true,passive:true});
     document.addEventListener('keydown',unlock,{capture:true});
     document.addEventListener('visibilitychange',()=>{
       if(!this.ctx)return;
@@ -30,7 +33,7 @@ class FairyMusic {
       this.nodes=[limiter,reverb,wet,delay,echo,feedback,this.bus,this.master];
       this.timer=setInterval(()=>this.tick(),80);this.nextAmbient=0;this.nextPhrase=0;
     }
-    if(this.ctx.state==='suspended')await this.ctx.resume();
+    if(this.ctx.state==='suspended'||this.ctx.state==='interrupted')await this.ctx.resume();
     if(!this.started){this.started=true;this.master.gain.setTargetAtTime(.5,this.ctx.currentTime,.8);}
   }
   play(event,delay=0){if(!this.ctx||this.ctx.state!=='running')return;this.queue.push({...event,at:this.ctx.currentTime+Math.max(0,delay)});if(this.queue.length>160)this.queue.splice(0,this.queue.length-160);}
@@ -58,7 +61,7 @@ class FairyMusic {
     if(round===2&&t>.94&&!this.breath){this.breath=true;this.queue=[];this.master?.gain.setTargetAtTime(.19,this.ctx.currentTime,.06);}
   }
   awaken(){this.stage='awakening';this.queue=[];if(this.ctx)this.master.gain.setTargetAtTime(.5,this.ctx.currentTime,.6);this.play({note:50,instrument:'warm',gain:.16});this.selected.forEach((name,i)=>{const f=FLOWERS[name];this.play({note:f.notes[0],instrument:f.instrument,gain:.12,pan:(i-1)*.35},.2+i*.2);this.play({note:f.notes[3],instrument:'glass',gain:.07},1+i*.25);});}
-  motion(name){if(!this.ctx||this.ctx.currentTime-(this.lastMotion||0)<1.4)return;this.lastMotion=this.ctx.currentTime;const f=FLOWERS[name];if(f)this.play({note:f.notes[2]+12,instrument:'glass',gain:.017});}
+  motion(name){if(!this.ctx||this.ctx.currentTime-(this.lastMotion||0)<1.4)return;this.lastMotion=this.ctx.currentTime;const f=FLOWERS[name];if(f)this.play({note:f.notes[2]+12,instrument:'air',gain:.017});}
   interact(family,name,pan=0){
     if(!this.ctx||this.ctx.state!=='running')return;const now=this.ctx.currentTime;if(now-this.lastHit<.12)return;this.lastHit=now;
     const key=family+name,count=this.variations.get(key)||0;this.variations.set(key,count+1);
@@ -70,7 +73,7 @@ class FairyMusic {
     if(family==='water')this.play({note:note+12,instrument:'glass',gain:.025,pan:-pan},.32);
     this.heardRoom=true;this.stats.areas.push(family);if(this.stats.areas.length>30)this.stats.areas.shift();
   }
-  dispose(){if(this.disposed)return;this.disposed=true;clearInterval(this.timer);this.queue=[];this.voices.forEach(v=>v.stop());this.ctx?.close().catch(()=>{});}
+  dispose(){if(this.disposed)return;this.disposed=true;clearInterval(this.timer);this.queue=[];this.voices.forEach(v=>{v.stop();v.cleanup();});this.voices=[];this.nodes?.forEach(n=>n.disconnect());this.ctx?.close().catch(()=>{});}
 }
 export const music=new FairyMusic();
 music.install();

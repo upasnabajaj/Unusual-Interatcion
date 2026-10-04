@@ -1,4 +1,5 @@
 import { frequency } from './score.js';
+const airBuffers=new WeakMap();
 const colours={
   celesta:[[1,1],[2.01,.28],[3.98,.12]], crystal:[[1,1],[2.002,.22],[4,.09]],
   glass:[[1,1],[2.005,.2],[3,.07]], bell:[[1,1],[2,.3],[4.01,.11]],
@@ -22,6 +23,12 @@ export function voice(ctx,destination,{note,instrument='glass',gain=.1,pan=0},wh
     partial.gain.setValueAtTime(level,when);partial.gain.exponentialRampToValueAtTime(.0001,when+duration/(ratio**.4));
     osc.connect(partial).connect(amp);nodes.push(osc,partial);oscillators.push(osc);
     osc.start(when);osc.stop(when+duration+.05);
+  }
+  if(instrument==='air') {
+    let buffer=airBuffers.get(ctx);
+    if(!buffer){buffer=ctx.createBuffer(1,ctx.sampleRate,ctx.sampleRate);const data=buffer.getChannelData(0);let seed=419;for(let i=0;i<data.length;i++){seed=(seed*1664525+1013904223)>>>0;data[i]=seed/4294967296*2-1;}airBuffers.set(ctx,buffer);}
+    const breath=ctx.createBufferSource(),band=ctx.createBiquadFilter(),level=ctx.createGain();breath.buffer=buffer;band.type='bandpass';band.frequency.value=frequency(note);band.Q.value=3;level.gain.value=.18;
+    breath.connect(band).connect(level).connect(amp);breath.start(when);breath.stop(when+.8);nodes.push(breath,band,level);oscillators.push(breath);
   }
   let cleaned=false;
   const cleanup=()=>{if(cleaned)return;cleaned=true;nodes.forEach(n=>n.disconnect());done();};
