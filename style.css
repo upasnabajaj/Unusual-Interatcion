@@ -118,8 +118,11 @@ body {
 }
 .dialogue p {
   position: absolute;
-  left: 75px;
-  top: 13px;
+  left: 24px;
+  right: 0;
+  text-align: center;
+  transform: translateY(-50%);
+  top: 50%;
   margin: 0;
   color: #fff;
   font-size: 24px;
@@ -129,7 +132,7 @@ body {
   letter-spacing: normal;
 }
 .dialogue p span {
-  padding-left: 5px;
+  padding-left: 0;
 }
 @keyframes float {
   0%,

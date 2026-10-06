@@ -78,10 +78,12 @@
 }
 .exploration-dialogue p {
   position: absolute;
-  left: 32px;
-  top: 10px;
+  left: 20px;
+  right: 0;
+  text-align: center;
+  transform: translateY(-50%);
+  top: 50%;
   margin: 0;
-  width: 186px;
   font:
     400 15px/1.36 Manrope,
     sans-serif;
