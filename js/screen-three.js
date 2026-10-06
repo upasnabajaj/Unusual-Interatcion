@@ -433,14 +433,14 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
     );
     session.startFinale();
     sync();
-    const turns=new Set();
     await music.perform('rounds',(time)=>{
       const {round,p:t}=roundPose(time,0);
       finalEnergy=round+t;
       fairies.forEach((f,i)=>{
         Object.assign(f,roundPose(time,i));position(f);f.character.setState('orbit');
         const cue=round===1?6.1+i*.55:round===2?13.3+i*.35:Infinity;
-        if(time>=cue&&!turns.has(round+':'+i)){turns.add(round+':'+i);f.character.twirl(1100);}
+        const turn=(time-cue)/1.1;
+        if(turn>=0&&turn<1)f.character.setPose({yaw:ease(turn)*Math.PI*2,depth:f.depth});else f.character.clearPose();
       });
       stones.forEach((stone,i)=>{
         const phase=((Math.atan2((stone.y-470)/158,(stone.x-720)/505)+Math.PI/2)/(Math.PI*2)+1)%1;
@@ -476,14 +476,15 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
     sync();
     scene.dataset.state='performance';
     const origins=fairies.map(f=>({x:f.x,y:f.y}));
-    let lettering,lastDust=0;const danceTurns=new Set();
+    let lettering,lastDust=0;
     await music.perform('ending',(time)=>{
       if(time>=12.725&&!lettering)lettering=mountEnding(world,fairies.map(f=>f.colour),async()=>{
         scene.inert=true;music.reset();
         await scene.animate([{opacity:1},{opacity:0}],{duration:700,fill:'forwards'}).finished;
         document.dispatchEvent(new Event('fairy:restart'));
       });
-      const tips=lettering?.update(Math.min(1,(time-12.725)/11.6));
+      const writing=(time-13.425)/10.9;
+      const tips=lettering?.update(Math.min(1,writing));
       fairies.forEach((f,i)=>{
         f.character.setState('dance');f.resting=false;
         if(!tips)Object.assign(f,dancePose(time,i,origins[i]));
@@ -493,7 +494,8 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
           if(time>24.325){const p=Math.min(1,(time-24.325)/1.325);f.x+=(440+i*240-86-f.x)*ease(p);f.y+=((i===1?110:380)-f.y)*ease(p);}
         }
         position(f);
-        if(time>4.15+i*.4&&!danceTurns.has(i)){danceTurns.add(i);f.character.twirl(1400);}
+        const turn=(time-4.15-i*.4)/1.4;
+        if(turn>=0&&turn<1)f.character.setPose({yaw:ease(turn)*Math.PI*2,depth:f.depth});else f.character.clearPose();
         if(time-lastDust>.075){const c=centre(f);effects.emit(c.x,c.y,f.colour,tips?3:1,.18);}
       });
       if(time-lastDust>.075)lastDust=time;
@@ -642,6 +644,8 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
     }).finished,
   ]);
   previous.hidden = true;
+  previous.cleanup?.(); previous.cleanup=null;
   scene.inert = false;
+  music.bloom(selected[0]);
   requestAnimationFrame(frame);
 }

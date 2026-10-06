@@ -12,12 +12,13 @@ const figure = {
   addEventListener: (type, handler) => keyboard.set(type, handler),
 };
 const scene = {
+  cloneNode: () => scene,
   addEventListener: (type, handler) => listeners.set(type, handler),
   setPointerCapture() {},
   hasPointerCapture: () => true,
   releasePointerCapture() {},
 };
-globalThis.document = { querySelector: () => scene };
+globalThis.document = { querySelector: () => scene, addEventListener() {} };
 Object.defineProperty(globalThis, "performance", {
   value: { now: () => time },
   configurable: true,

@@ -205,5 +205,6 @@ export async function showScreenTwo(previous, twirlFinished = Promise.resolve())
     }).finished,
   ]);
   previous.hidden = true;
+  previous.cleanup?.(); previous.cleanup=null;
   scene.inert = false;
 }

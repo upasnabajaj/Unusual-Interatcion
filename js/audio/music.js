@@ -54,10 +54,10 @@ class FairySound {
     const ready=this.queue.filter(e=>e.at<=c.currentTime+.07);this.queue=this.queue.filter(e=>e.at>c.currentTime+.07);
     for(const e of ready){if(e.at<c.currentTime-.3)continue;while(this.voices.length>=16)this.voices.shift().stop();let v;v=voice(c,this.bus,e,Math.max(c.currentTime+.005,e.at),()=>{this.voices=this.voices.filter(x=>x!==v);});this.voices.push(v);this.stats.notes++;this.stats.peakVoices=Math.max(this.stats.peakVoices,this.voices.length);}
   }
-  setStage(stage,selected){this.stage=stage;if(selected)this.selected=[...selected];if(stage!=='opening')this.stopGroup('opening');if(stage==='exploring')this.bloom(this.selected[0]);}
+  setStage(stage,selected){this.stage=stage;if(selected)this.selected=[...selected];if(stage!=='opening')this.stopGroup('opening');}
   select(name,selected,on){
     this.selected=[...selected];const f=FLOWERS[name];if(!f)return;
-    if(!this.ctx||this.ctx.state!=='running'){this.unlock().then(()=>this.select(name,selected,on));return;}
+    if(!this.ctx||this.ctx.state!=='running'){this.unlock().then(()=>{if(this.ctx?.state==='running')this.select(name,selected,on);});return;}
     const rhythm={Lotus:[0,.22,.5],Rose:[0,.13,.38],Jasmine:[0,.28,.46],Daisy:[0,.12,.31],Tulip:[0,.19,.44],Lily:[0,.24,.52]}[name];
     (on?[0,1,3]:[1,0]).forEach((n,i)=>this.play({note:f.notes[n]-(on?0:12),instrument:f.instrument,gain:on?.22:.07,pan:(this.selected.indexOf(name)-1)*.2},on?rhythm[i]:i*.16));
     if(on)this.play({note:f.notes[0]+12,instrument:'glass',gain:.04},.1);
@@ -66,7 +66,7 @@ class FairySound {
   activation(name,t){const f=FLOWERS[name];if(!f)return;if(this.chargeName!==name){this.chargeName=name;this.chargeStep=-1;this.approach(name,0);}const step=Math.floor(t*4);if(step<=this.chargeStep)return;this.chargeStep=step;this.play({note:f.notes[step%4]+(step===4?12:0),instrument:step===4?'glass':'harp',gain:.065+step*.02});}
   motif(name){const f=FLOWERS[name];if(!f)return;[0,.23,.58,1.0].forEach((delay,i)=>this.play({note:f.notes[i],instrument:f.instrument,gain:.15},delay));this.play({note:f.notes[0]-12,instrument:'strings',gain:.075});}
   bloom(name){const f=FLOWERS[name];if(!f)return;[0,.16,.34,.56].forEach((delay,i)=>this.play({note:f.notes[i],instrument:'harp',gain:.12},delay));this.play({note:f.notes[0]-12,instrument:'strings',gain:.13},.3);this.play({note:f.notes[3],instrument:'celesta',gain:.17},.72);this.play({note:f.notes[0]+12,instrument:'choir',gain:.06},.9);}
-  twirl(name){if(!name){this.stopGroup('opening');this.cue('transition','transition').catch(()=>{});return;}const f=FLOWERS[name];[0,1,3].forEach((n,i)=>this.play({note:f.notes[n],instrument:'harp',gain:.055},i*.2));}
+  twirl(name){if(!name){this.stopGroup('opening');this.cue(this.stage==='opening'?'passage':'transition','transition').catch(()=>{});return;}const f=FLOWERS[name];[0,1,3].forEach((n,i)=>this.play({note:f.notes[n],instrument:'harp',gain:.055},i*.2));}
   gathering(){this.queue=[];}
   awaken(){this.stopGroup('performance');}
   async perform(name,update){

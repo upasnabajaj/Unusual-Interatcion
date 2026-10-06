@@ -28,14 +28,11 @@ for(let a=0;a<4;a++)for(let b=a+1;b<5;b++)for(let c=b+1;c<6;c++){
   for(const f of trio)assert(CHORDS[bar%8].some(n=>n%12===harmonize(FLOWERS[f].notes[0],bar)%12));
  }
 }
-music.stage='awakened';
-music.placement([{name:'Lotus',x:.1,y:.1,area:'water'},{name:'Rose',x:.9,y:.8,area:'plants'},{name:'Lily',x:.5,y:.5,area:'stone'}]);
-const original={flower:'Lotus',note:74,instrument:'glass',gain:.1};
-assert.equal(music.arrange(original).note,86);
-const spacious=music.unity;
-for(let i=0;i<150;i++)music.placement(['Lotus','Rose','Lily'].map((name,i)=>({name,x:.45+i*.02,y:.8,area:'plants'})));
-assert(music.unity>spacious+.5);
-assert.equal(music.arrange(original).note,62);
-assert.equal(music.arrange(original).instrument,'harp');
-assert.equal(music.arrange(original).pan,0,'Continuous flower bus supplies smooth stereo');
-console.log('PASS: 20 trios in the eight-bar waltz, harmony-aware accents and positional arrangement');
+
+assert.equal(music.placement,undefined,'No positional music remix');
+assert.equal(music.queue.length,0,'No continuous score');
+const {CUES}=await import('../js/audio/cues.js');
+for(const cue of Object.values(CUES)){assert(cue.start>=0&&cue.end<=30);assert(cue.end>cue.start+cue.fadeIn+cue.fadeOut);}
+const {roundPose}=await import('../js/choreography.js');
+for(let i=0;i<3;i++)for(let t=0;t<19.425;t+=.1){const p=roundPose(t,i);assert(Number.isFinite(p.x)&&Number.isFinite(p.y));assert(p.round>=0&&p.round<3);}
+console.log('PASS: quiet event score, bounded source excerpts and finite choreography');
