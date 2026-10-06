@@ -275,7 +275,6 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
     if (!stone.flower) return;
     // A nearby stone click carries her onto it; a drag-and-hold does the same.
     if (!session.beginFlower(index, p)) return;
-    music.activation(stone.flower,0);
     active.character.setState("activate");
     sync();
     hideDialogue();
@@ -285,8 +284,10 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
     const f = active;
     const overhead=stoneOrbitPose(stone,0);
     await move(f, overhead.x, overhead.y, 950);
+    music.stoneArrival(stone.flower);
     // Pause at her own stone before its ivory light awakens.
     await animate(2000, () => {}, true);
+    music.stoneOrbit();
     stoneElements[index].classList.add("rock-awakening");
     await animate(1000, (t) => {
       stone.rockLight = t;
@@ -295,12 +296,10 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
     });
     await animate(1700, (t) => {
       Object.assign(f,stoneOrbitPose(stone,(1000+t*1700)/2700));position(f);
-      music.activation(stone.flower,t);
       stone.charge = t;
       stoneElements[index].style.setProperty("--charge", String(t));
       stone.halo.style.setProperty("--flower-colour", stone.colour);
     });
-    music.motif(stone.flower);
     session.completeFlower();
     sync();
     const heart = centre(f);
@@ -311,7 +310,6 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
     });
     orb.style.opacity = "0";
     const pose = f.el.querySelector(".fairy-pose");
-    music.twirl(stone.flower);
     const spin = f.character.twirl(reduced ? 650 : 1800);
     await Promise.all([
       spin.finished,
@@ -380,8 +378,8 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
       orb.style.transform = `translate(-50%,-50%) scale(${0.5 + t * 0.8})`;
       if (!reduced) effects.emit(x, y, "#eee6ff", 1, 0.25);
     });
-    music.bloom(session.selectionOrder[session.activeFairy + 1]);
     const next = createFairy(tx - 86, ty - 139, true);
+    music.materialize();
     await animate(1200, (t) => {
       next.el.style.opacity = String(t);
       next.el.querySelector(".fairy-pose").style.transform =
@@ -588,7 +586,7 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
             Math.hypot(s.x - p.x, s.y - p.y) < 48,
         );
       const targetStone=stones.find(s=>session.isTarget(s));
-      if(targetStone)music.approach(targetStone.flower,Math.hypot(targetStone.x-p.x,targetStone.y-p.y));
+
       if (index >= 0) {
         if (holdStone !== index) {
           holdStone = index;
@@ -640,6 +638,5 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
   previous.hidden = true;
   previous.cleanup?.(); previous.cleanup=null;
   scene.inert = false;
-  music.bloom(selected[0]);
   requestAnimationFrame(frame);
 }

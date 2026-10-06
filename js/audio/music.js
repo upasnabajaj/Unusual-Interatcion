@@ -3,7 +3,7 @@ import { voice } from './instruments.js';
 import { SOURCES,CUES } from './cues.js';
 
 class FairySound {
-  constructor(){this.selected=[];this.stage='opening';this.selectionCues=new Set();this.queue=[];this.voices=[];this.sources=new Set();this.buffers={};this.generation=0;this.stats={notes:0,peakVoices:0,cues:[]};}
+  constructor(){this.selected=[];this.stage='opening';this.selectionCues=new Set();this.flowerVoices=new Map();this.stoneArrivals=new Set();this.queue=[];this.voices=[];this.sources=new Set();this.buffers={};this.generation=0;this.stats={notes:0,peakVoices:0,cues:[]};}
   install(){
     if(this.installed||typeof document==='undefined')return;this.installed=true;
     // Fetch before the gesture; decoding uses the single unlocked context.
@@ -54,19 +54,31 @@ class FairySound {
     this.selected=[...selected];const f=FLOWERS[name];if(!f)return;
     if(!this.ctx||this.ctx.state!=='running'){this.unlock().then(()=>{if(this.ctx?.state==='running')this.select(name,selected,on);});return;}
     const rank=this.selected.length;
+    if(on&&rank>=1&&rank<=3&&!this.flowerVoices.has(name))this.flowerVoices.set(name,`breath${rank}`);
     if(on&&this.stage==='selection'&&rank>=1&&rank<=3&&!this.selectionCues.has(rank)){
       this.selectionCues.add(rank);
+      this.flowerVoices.set(name,`breath${rank}`);
       this.cue(`breath${rank}`,'selection-voice',()=>this.stage==='selection').catch(()=>{});
     }
     const rhythm={Lotus:[0,.22,.5],Rose:[0,.13,.38],Jasmine:[0,.28,.46],Daisy:[0,.12,.31],Tulip:[0,.19,.44],Lily:[0,.24,.52]}[name];
     (on?[0,1,3]:[1,0]).forEach((n,i)=>this.play({note:f.notes[n]-(on?0:12),instrument:f.instrument,gain:on?.22:.07,pan:(this.selected.indexOf(name)-1)*.2},on?rhythm[i]:i*.16));
     if(on)this.play({note:f.notes[0]+12,instrument:'glass',gain:.04},.1);
   }
+  stoneArrival(name){
+    const cue=this.flowerVoices.get(name);
+    if(!cue||this.stoneArrivals.has(name))return;
+    this.stoneArrivals.add(name);
+    this.cue(cue,'stone-arrival').catch(()=>{});
+  }
+  stoneOrbit(){
+    this.stopGroup('stone-arrival');
+    this.cue('passage','stone-orbit').catch(()=>{});
+  }
   approach(name,distance){if(distance>60||!this.ctx)return;if(this.arrived===name)return;this.arrived=name;const f=FLOWERS[name];if(f)this.play({note:f.notes[0],instrument:'glass',gain:.10});}
   activation(name,t){const f=FLOWERS[name];if(!f)return;if(this.chargeName!==name){this.chargeName=name;this.chargeStep=-1;this.approach(name,0);}const step=Math.floor(t*4);if(step<=this.chargeStep)return;this.chargeStep=step;this.play({note:f.notes[step%4]+(step===4?12:0),instrument:step===4?'glass':'harp',gain:.065+step*.02});}
   motif(name){const f=FLOWERS[name];if(!f)return;[0,.23,.58,1.0].forEach((delay,i)=>this.play({note:f.notes[i],instrument:f.instrument,gain:.15},delay));this.play({note:f.notes[0]-12,instrument:'strings',gain:.075});}
-  bloom(name){const f=FLOWERS[name];if(!f)return;[0,.16,.34,.56].forEach((delay,i)=>this.play({note:f.notes[i],instrument:'harp',gain:.12},delay));this.play({note:f.notes[0]-12,instrument:'strings',gain:.13},.3);this.play({note:f.notes[3],instrument:'celesta',gain:.17},.72);this.play({note:f.notes[0]+12,instrument:'choir',gain:.06},.9);}
-  twirl(name){if(!name){if(this.stage==='opening'||(this.stage==='selection'&&this.selected.length===3)){this.stopGroup('selection-voice');this.cue('passage','transition').catch(()=>{});}return;}const f=FLOWERS[name];[0,1,3].forEach((n,i)=>this.play({note:f.notes[n],instrument:'harp',gain:.055},i*.2));}
+  materialize(){this.cue('magic','birth').catch(()=>{});}
+  twirl(name){if(!name){if(this.stage==='opening'||(this.stage==='selection'&&this.selected.length===3)){this.stopGroup('selection-voice');this.cue(this.stage==='selection'?'magic':'passage','transition').catch(()=>{});}return;}const f=FLOWERS[name];[0,1,3].forEach((n,i)=>this.play({note:f.notes[n],instrument:'harp',gain:.055},i*.2));}
   gathering(){this.queue=[];}
   awaken(){this.stopGroup('performance');}
   async perform(name,update){
@@ -79,7 +91,7 @@ class FairySound {
     const wallStart=performance.now(),start=this.ctx?.currentTime||0,duration=CUES[name].end-CUES[name].start;
     return new Promise(resolve=>{const frame=()=>{if(generation!==this.generation){resolve();return;}const time=track?track.time:Math.min(duration,(this.ctx?this.ctx.currentTime-start:(performance.now()-wallStart)/1000));update(time,duration);if(time<duration)requestAnimationFrame(frame);else resolve();};requestAnimationFrame(frame);});
   }
-  reset(){this.generation++;this.queue=[];for(const s of [...this.sources])s.stop();for(const v of this.voices)v.stop();this.voices=[];this.selected=[];this.stage='opening';this.selectionCues.clear();this.arrived=null;this.chargeName=null;this.chargeStep=-1;}
+  reset(){this.generation++;this.queue=[];for(const s of [...this.sources])s.stop();for(const v of this.voices)v.stop();this.voices=[];this.selected=[];this.stage='opening';this.selectionCues.clear();this.flowerVoices.clear();this.stoneArrivals.clear();this.arrived=null;this.chargeName=null;this.chargeStep=-1;}
   dispose(){this.reset();clearInterval(this.timer);this.nodes?.forEach(n=>n.disconnect());this.ctx?.close().catch(()=>{});}
 }
 export const music=new FairySound();music.install();
