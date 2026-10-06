@@ -71,8 +71,8 @@ export async function showScreenTwo(previous, twirlFinished = Promise.resolve())
       <div class="fairy-position selection-fairy">
         <div class="fairy-turn" role="button" tabindex="0" aria-label="Fairy. Double-tap to twirl" aria-disabled="true">
           <div class="fairy-size"><div class="fairy-mirror"><div class="fairy-art" aria-hidden="true">
-            <img class="fairy-layer fairy-body" src="assets/fairy.png" alt="" draggable="false">
-            <img class="fairy-layer fairy-wing" src="assets/fairy.png" alt="" draggable="false">
+
+
           </div></div></div>
         </div>
       </div>

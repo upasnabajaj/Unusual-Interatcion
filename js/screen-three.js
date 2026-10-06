@@ -123,7 +123,7 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
       "aria-label",
       "Drag the fairy to carry her light; arrow keys move her",
     );
-    el.innerHTML = `<div class="fairy-pose"><div class="explorer-scale"><div class="fairy-art" aria-hidden="true"><img class="fairy-layer fairy-body" src="assets/fairy.png" alt="" draggable="false"><img class="fairy-layer fairy-wing" src="assets/fairy.png" alt="" draggable="false"></div></div></div><svg class="tint-definitions" aria-hidden="true"><filter id="fairy-tint-${id}" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0"/></filter></svg>`;
+    el.innerHTML = `<div class="fairy-pose"><div class="explorer-scale"><div class="fairy-art" aria-hidden="true"></div></div></div>`;
     scene.querySelector(".exploration-fairies").append(el);
     const f = {
       el,
@@ -146,7 +146,6 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
     scene.querySelector(".final-fairy-lights").append(light, aura);
     f.light = light;
     f.aura = aura;
-    el.querySelector(".explorer-scale").style.filter = `url(#fairy-tint-${id})`;
     if (materialising) {
       el.style.opacity = "0";
       el.style.pointerEvents = "none";
@@ -267,14 +266,6 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
   sanctuary.addFairy(active);
   function tint(f, colour, amount) {
     f.character.setColour(colour,amount);
-    const rgb = colour.match(/[0-9a-f]{2}/gi).map((n) => parseInt(n, 16) / 255);
-    const [r, g, b] = rgb.map((v) => 1 + (v - 1) * amount);
-    f.el
-      .querySelector("feColorMatrix")
-      .setAttribute(
-        "values",
-        `${r} 0 0 0 0 0 ${g} 0 0 0 0 0 ${b} 0 0 0 0 0 1 0`,
-      );
     f.el.style.setProperty("--fairy-colour", colour);
     f.el.style.setProperty("--colour-strength", String(amount));
   }
@@ -302,6 +293,7 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
     // A nearby stone click carries her onto it; a drag-and-hold does the same.
     if (!session.beginFlower(index, p)) return;
     music.activation(stone.flower,0);
+    active.character.setState("activate");
     sync();
     hideDialogue();
     drag = null;
@@ -350,6 +342,7 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
     f.colour = stone.colour;
     // A compact orbit around her own stone; no light spills onto future targets.
     const home = { x: stone.x - 86, y: stone.y - 139 };
+    f.character.setState("orbit");
     await animate(2200, (t) => {
       const angle = t * Math.PI * 2;
       f.x = home.x + Math.sin(angle) * 48;
@@ -358,6 +351,7 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
     });
     f.target = { x: f.x, y: f.y };
     f.resting = true;
+    f.character.setState("hover");
     f.el.classList.add("resting");
     f.el.tabIndex = -1;
     f.el.setAttribute("aria-label", `${stone.flower} fairy`);
