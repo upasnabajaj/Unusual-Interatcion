@@ -167,8 +167,10 @@
 }
 .selection-dialogue p {
   position: absolute;
-  left: 23px;
-  right: 0;
+  left: 31px;
+  right: 8px;
+  box-sizing: border-box;
+  white-space: nowrap;
   text-align: center;
   transform: translateY(-50%);
   top: 50%;
