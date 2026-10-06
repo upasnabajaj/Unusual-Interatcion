@@ -5,7 +5,7 @@ export const CUES={
   breath1:{source:'opening',start:1.42,end:6.65,gain:1.7,fadeIn:.10,fadeOut:.32},
   breath2:{source:'opening',start:6.85,end:11.90,gain:1.7,fadeIn:.10,fadeOut:.32},
   breath3:{source:'opening',start:12.05,end:17.72,gain:1.7,fadeIn:.10,fadeOut:.42},
-  passage:{source:'opening',start:18.55,end:21.18,gain:2.0,fadeIn:.045,fadeOut:.20},
+  passage:{source:'opening',start:22.95,end:25.58,gain:2.0,fadeIn:.045,fadeOut:.20},
   transition:{source:'opening',start:18.55,end:19.84,gain:2.0,fadeIn:.025,fadeOut:.16},
   rounds:{source:'rounds',start:2.60,end:22.025,gain:.36,fadeIn:.12,fadeOut:.40},
   ending:{source:'ending',start:.475,end:26.125,gain:.52,fadeIn:.12,fadeOut:.48},

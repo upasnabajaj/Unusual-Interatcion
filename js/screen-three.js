@@ -1,4 +1,4 @@
-import { roundPose, dancePose } from './choreography.js';
+import { roundPose, dancePose, stoneOrbitPose, createStoneRoute } from './choreography.js';
 import { mountEnding } from './ending.js';
 import { ROUND_BREAKS } from './audio/cues.js';
 import { FairyCharacter } from "./fairy3d/controller.js";
@@ -283,14 +283,18 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
     hold = 0;
     active.el.classList.remove("dragging");
     const f = active;
-    await move(f, stone.x - 86, stone.y - 139, 950);
+    const overhead=stoneOrbitPose(stone,0);
+    await move(f, overhead.x, overhead.y, 950);
     // Pause at her own stone before its ivory light awakens.
     await animate(2000, () => {}, true);
     stoneElements[index].classList.add("rock-awakening");
     await animate(1000, (t) => {
       stone.rockLight = t;
+      f.character.setState("orbit");
+      Object.assign(f,stoneOrbitPose(stone,t*1000/2700));position(f);
     });
     await animate(1700, (t) => {
+      Object.assign(f,stoneOrbitPose(stone,(1000+t*1700)/2700));position(f);
       music.activation(stone.flower,t);
       stone.charge = t;
       stoneElements[index].style.setProperty("--charge", String(t));
@@ -323,15 +327,10 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
       `Awakened ${stone.flower} engraving`,
     );
     f.colour = stone.colour;
-    // A compact orbit around her own stone; no light spills onto future targets.
-    const home = { x: stone.x - 86, y: stone.y - 139 };
-    f.character.setState("orbit");
-    await animate(2200, (t) => {
-      const angle = t * Math.PI * 2;
-      f.x = home.x + Math.sin(angle) * 48;
-      f.y = home.y + (1 - Math.cos(angle)) * 16;
-      position(f);
-    });
+    // Return from the overhead orbit without a second circle around her own body.
+    f.character.setState("hover");
+    await move(f,stone.x-86,stone.y-115-139,2200);
+    f.depth=0;
     f.target = { x: f.x, y: f.y };
     f.resting = true;
     f.character.setState("hover");
@@ -413,13 +412,8 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
     session.completeBirth();
     sync();
   }
-  function orbit(angle, index) {
-    return {
-      x: 720 + Math.cos(angle) * 505 - 69 + index * 25,
-      y: 470 + Math.sin(angle) * 158 - 139 - index * 19,
-    };
-  }
   async function finale() {
+    const route=createStoneRoute(stones);
     music.gathering();
     effects.colours = fairies.map((f) => f.colour);
     const p = centre(active);
@@ -427,24 +421,24 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
     await Promise.all(
       fairies.map((f, i) => {
         f.resting = false;
-        const point = orbit(-Math.PI / 2, i);
+        const point = roundPose(0,i,route);
         return move(f, point.x, point.y, 1700);
       }),
     );
     session.startFinale();
     sync();
     await music.perform('rounds',(time)=>{
-      const {round,p:t}=roundPose(time,0);
+      const {round,p:t}=roundPose(time,0,route);
       finalEnergy=round+t;
       fairies.forEach((f,i)=>{
-        Object.assign(f,roundPose(time,i));position(f);f.character.setState('orbit');
+        Object.assign(f,roundPose(time,i,route));position(f);f.character.setState('orbit');
         const cue=round===1?6.1+i*.55:round===2?13.3+i*.35:Infinity;
         const turn=(time-cue)/1.1;
         if(turn>=0&&turn<1)f.character.setPose({yaw:ease(turn)*Math.PI*2,depth:f.depth});else f.character.clearPose();
       });
       stones.forEach((stone,i)=>{
-        const phase=((Math.atan2((stone.y-470)/158,(stone.x-720)/505)+Math.PI/2)/(Math.PI*2)+1)%1;
-        if(!stone.flower&&!stone.awakened&&(round>0||t>=phase)){
+        const passing=fairies.some(f=>Math.hypot(f.x+86-stone.x,f.y+139-(stone.y-(115+(630-stone.y)*.28)))<75);
+        if(!stone.flower&&!stone.awakened&&passing){
           session.awakenNormal(i,stone);stoneElements[i].classList.add('awakened','empty-awakened');
         }
       });
