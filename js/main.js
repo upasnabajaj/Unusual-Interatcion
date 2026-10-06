@@ -1,8 +1,10 @@
 import { music } from "./audio/music.js";
 import { Fairy } from "./fairy.js?v=petal-fairy-20";
 
-const scene = document.querySelector("#screen-one");
+const original = document.querySelector("#screen-one").cloneNode(true);
+function mountOpening(scene) {
 const fairy = new Fairy(scene);
+scene.cleanup=()=>fairy.destroy();
 let down = null;
 let previousTap = null;
 
@@ -63,3 +65,10 @@ scene.addEventListener(
   },
   { once: true },
 );
+
+}
+mountOpening(document.querySelector('#screen-one'));
+document.addEventListener('fairy:restart',()=>{
+ for(const scene of document.querySelectorAll('main')){scene.cleanup?.();scene.remove();}
+ music.reset();const scene=original.cloneNode(true);document.body.append(scene);mountOpening(scene);music.unlock();
+});

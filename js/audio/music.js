@@ -76,8 +76,8 @@ class FairySound {
     if(generation!==this.generation)return;
     // The same audio clock also supports an unavailable-file fallback, so the
     // experience never dead-ends or relies on unrelated timer chains.
-    const start=this.ctx?.currentTime||0,duration=CUES[name].end-CUES[name].start;
-    return new Promise(resolve=>{const frame=()=>{if(generation!==this.generation){resolve();return;}const time=track?track.time:Math.min(duration,(this.ctx?.currentTime||0)-start);update(time,duration);if(time<duration)requestAnimationFrame(frame);else resolve();};requestAnimationFrame(frame);});
+    const wallStart=performance.now(),start=this.ctx?.currentTime||0,duration=CUES[name].end-CUES[name].start;
+    return new Promise(resolve=>{const frame=()=>{if(generation!==this.generation){resolve();return;}const time=track?track.time:Math.min(duration,(this.ctx?this.ctx.currentTime-start:(performance.now()-wallStart)/1000));update(time,duration);if(time<duration)requestAnimationFrame(frame);else resolve();};requestAnimationFrame(frame);});
   }
   reset(){this.generation++;this.queue=[];for(const s of [...this.sources])s.stop();for(const v of this.voices)v.stop();this.voices=[];this.selected=[];this.stage='opening';this.openingStarted=false;this.arrived=null;this.chargeName=null;this.chargeStep=-1;}
   dispose(){this.reset();clearInterval(this.timer);this.nodes?.forEach(n=>n.disconnect());this.ctx?.close().catch(()=>{});}

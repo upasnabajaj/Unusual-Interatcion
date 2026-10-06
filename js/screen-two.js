@@ -179,6 +179,7 @@ export async function showScreenTwo(previous, twirlFinished = Promise.resolve())
     scene.style.setProperty("--selection-light-y", `${y + 300 * scale}px`);
     scene.style.setProperty("--selection-light-radius", `${340 * scale}px`);
   };
+  scene.cleanup=()=>{removeEventListener("resize",resize);fairy.destroy();};
   addEventListener("resize", resize);
   resize();
   await Promise.all(
