@@ -1,5 +1,5 @@
 import { music } from "./audio/music.js";
-import { Fairy } from "./fairy.js?v=spatial-fairies-19";
+import { Fairy } from "./fairy.js?v=petal-fairy-20";
 
 const scene = document.querySelector("#screen-one");
 const fairy = new Fairy(scene);
@@ -58,7 +58,7 @@ scene.addEventListener(
   "fairy:twirl-start",
   async () => {
     const finished = new Promise(resolve => scene.addEventListener("fairy:twirl-complete", resolve, { once: true }));
-    const { showScreenTwo } = await import("./screen-two.js?v=spatial-fairies-19");
+    const { showScreenTwo } = await import("./screen-two.js?v=petal-fairy-20");
     await showScreenTwo(scene, finished);
   },
   { once: true },

@@ -16,6 +16,6 @@ assert.notEqual(material.color.getHex(),b.wings[0].pivot.children[0].material.co
 for(const hex of ['#b57aff','#ffcd70','#efa6c9','#89baff','#96dca7','#f4ae8f']){
  a.colour(hex);assert(material.transparent);assert(material.opacity<.5);
 }
-assert(a.skirt.children.length>8);
+assert(a.skirt.children.some(m=>m.isMesh&&m.geometry.attributes.position.count>1000),'Layered petal geometry retained after batching');
 a.dispose();b.dispose();
 console.log('PASS: real 3D volume, four curved wings, articulated limbs, independent six-colour rendering and disposal');
