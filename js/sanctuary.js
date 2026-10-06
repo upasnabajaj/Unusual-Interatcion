@@ -87,9 +87,6 @@ export function mountSanctuary(world, stones, background) {
     },
     addFairy(f) {
       const pose=f.el.querySelector('.fairy-pose');
-      const pearl=document.createElement('div');pearl.className='fairy-pearl';pearl.setAttribute('aria-hidden','true');
-      pearl.innerHTML='<div class="fairy-art"><img class="fairy-layer fairy-body" src="assets/fairy.png" alt="" draggable="false"><img class="fairy-layer fairy-wing" src="assets/fairy.png" alt="" draggable="false"></div>';
-      pose.append(pearl);
       const dust=document.createElement('div');dust.className='fairy-dust';dust.setAttribute('aria-hidden','true');
       dust.innerHTML=Array.from({length:7},(_,i)=>`<i style="left:${18+seed(i+9)*95}px;top:${22+seed(i+17)*175}px;--delay:-${i*.7}s"></i>`).join('');pose.append(dust);
       const reflection=svg('sanctuary-fairy-reflection',ripples(0,0,72,'#ffffff',f.id+40));

@@ -1,3 +1,4 @@
+import { FairyCharacter } from "./fairy3d/controller.js";
 import { music } from "./audio/music.js";
 /** Screen-independent character behavior. Artwork and dialogue share one position. */
 export class Fairy {
@@ -5,6 +6,7 @@ export class Fairy {
     this.scene = scene;
     this.rig = scene.querySelector(".fairy-position");
     this.figure = scene.querySelector(".fairy-turn");
+    this.character = new FairyCharacter(scene.querySelector(".fairy-art"), {facing: scene.id === "screen-two" ? -.4 : .4});
     this.motion = matchMedia("(prefers-reduced-motion: reduce)");
     this.position = { x: 0, y: 0 };
     this.scale = 1;
@@ -51,27 +53,7 @@ export class Fairy {
     music.twirl();
     this.position = { ...this.position };
     this.scene.dataset.state = "twirling";
-    const frames = this.motion.matches
-      ? [{ opacity: 1 }, { opacity: 0.72 }, { opacity: 1 }]
-      : [
-          {
-            transform:
-              "perspective(1000px) rotateY(0deg) rotateZ(0deg) translateY(0)",
-          },
-          {
-            transform:
-              "perspective(1000px) rotateY(160deg) rotateZ(-5deg) translateY(-15px)",
-            offset: 0.45,
-          },
-          {
-            transform:
-              "perspective(1000px) rotateY(360deg) rotateZ(0deg) translateY(0)",
-          },
-        ];
-    this.twirlAnimation = this.figure.animate(frames, {
-      duration: this.motion.matches ? 260 : 1350,
-      easing: "cubic-bezier(.35,0,.25,1)",
-    });
+    this.twirlAnimation = this.character.twirl(this.motion.matches ? 260 : 1350);
     this.scene.dispatchEvent(new CustomEvent("fairy:twirl-start"));
     try {
       await this.twirlAnimation.finished;
@@ -87,5 +69,6 @@ export class Fairy {
   destroy() {
     removeEventListener("resize", this.resize);
     this.twirlAnimation?.cancel();
+    this.character.dispose();
   }
 }

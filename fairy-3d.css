@@ -1,0 +1,7 @@
+/* Character-only overrides: retain the existing boxes, hit targets and scene layering. */
+.fairy-art.fairy-3d {animation:none!important;filter:drop-shadow(0 0 3px #e9ecff22)!important;overflow:visible;}
+.fairy-3d-canvas {display:block;width:100%;height:100%;pointer-events:none;}
+.fairy-mirror.fairy-3d-mirror {transform:none;}
+.explorer:has(.fairy-3d) .explorer-scale {opacity:1;filter:none!important;}
+.explorer:has(.fairy-3d) .fairy-pose {filter:drop-shadow(0 0 3px color-mix(in srgb,var(--fairy-colour,#fff) 30%,transparent));}
+.explorer:has(.fairy-3d) .fairy-pearl {display:none;}

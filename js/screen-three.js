@@ -1,9 +1,10 @@
+import { FairyCharacter } from "./fairy3d/controller.js";
 import { music } from "./audio/music.js";
 import {
   AwakeningSession,
   flowerColours,
 } from "./stones.js?v=centred-patterns-13";
-import { mountSanctuary } from "./sanctuary.js?v=centred-patterns-13";
+import { mountSanctuary } from "./sanctuary.js?v=spatial-fairies-19";
 import { MagicEffects } from "./magic-effects.js";
 
 const BG = "assets/screen-three/six-stone-environment.png";
@@ -133,6 +134,7 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
       id,
       resting: false,
     };
+    f.character = new FairyCharacter(el.querySelector(".fairy-art"));
     fairies.push(f);
     if(sanctuary) sanctuary.addFairy(f);
     const light = document.createElement("img");
@@ -264,6 +266,7 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
   sanctuary = mountSanctuary(world, stones, BG);
   sanctuary.addFairy(active);
   function tint(f, colour, amount) {
+    f.character.setColour(colour,amount);
     const rgb = colour.match(/[0-9a-f]{2}/gi).map((n) => parseInt(n, 16) / 255);
     const [r, g, b] = rgb.map((v) => 1 + (v - 1) * amount);
     f.el
@@ -276,6 +279,7 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
     f.el.style.setProperty("--colour-strength", String(amount));
   }
   function position(f) {
+    f.character.moveTo(f.x,f.y);
     f.el.style.transform = `translate(${f.x}px,${f.y}px)`;
   }
   async function move(f, x, y, duration = 1800) {
@@ -329,19 +333,7 @@ export async function showScreenThree(previous, selected, twirlFinished = Promis
     orb.style.opacity = "0";
     const pose = f.el.querySelector(".fairy-pose");
     music.twirl(stone.flower);
-    const spin = pose.animate(
-      reduced
-        ? [{ opacity: 1 }, { opacity: 0.7 }, { opacity: 1 }]
-        : [
-            { transform: "perspective(900px) rotateY(0deg) translateY(0)" },
-            {
-              transform: "perspective(900px) rotateY(180deg) translateY(-18px)",
-              offset: 0.5,
-            },
-            { transform: "perspective(900px) rotateY(360deg) translateY(0)" },
-          ],
-      { duration: reduced ? 650 : 1800, easing: "cubic-bezier(.35,0,.25,1)" },
-    );
+    const spin = f.character.twirl(reduced ? 650 : 1800);
     await Promise.all([
       spin.finished,
       animate(1800, (t) => {
