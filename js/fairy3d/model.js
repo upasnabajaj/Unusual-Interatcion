@@ -32,6 +32,7 @@ for(const node of asset.nodes){if(node.mesh===undefined)continue;if(node.matrix|
  }
 }
 const meshes=[...buckets.values()].map(b=>{const geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.Float32BufferAttribute(b.positions,3));geometry.setAttribute('normal',new T.Float32BufferAttribute(b.normals,3));geometry.setIndex(b.indices);geometry.computeBoundingSphere();return {group:b.group,material:b.material,geometry};});
+buckets.clear();
 export function buildFairy(){
  const root=new T.Group(),groups={};for(const [name,position] of Object.entries(pivots)){const g=new T.Group();g.name=name;g.position.copy(position);root.add(g);groups[name]=g;}
  const materials=asset.materials.map(source=>{

@@ -53,3 +53,7 @@ rounds and the movable final state. A touch/reduced-motion browser check covers
 screen progression and rotation from portrait to landscape. Visual captures
 were inspected at desktop scale. Physical iOS/Android device testing is not
 available in this environment.
+
+
+## Supplied refined fairy replacement
+The character now uses `assets/refined-fairy/fairy.glb`, an unchanged copy of the supplied Fairy-Refined-Eyes.glb. The model adapter reads its uncompressed, texture-free mesh data and batches named pieces by material and animated part (44 mesh batches rather than 659 separate objects). Geometry is shared across fairies and retained for restart; each instance owns its materials and animation groups. The supplied file has no skeletal rig: wing roots, head, arms and skirt get procedural pivots compatible with the existing controller. No choreography, audio, scene positioning or character controller changes are required. Flower colours tint wings, dress and small decorative highlights; skin, hazel eyes and black hair retain their original colours.
